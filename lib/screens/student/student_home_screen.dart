@@ -8,6 +8,7 @@ import '../reports/report_detail_screen.dart';
 import '../safeguarding/track_incident_screen.dart';
 import 'submit_incident_screen.dart';
 import 'submit_report_screen.dart';
+import '../profile/profile_screen.dart';
 
 class StudentHomeScreen extends StatefulWidget {
   const StudentHomeScreen({super.key});
@@ -63,6 +64,16 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
         title: const Text('AiNARA Siswa'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Profil Saya',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              ).then((_) => _loadDashboard());
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Keluar',
             onPressed: _logout,
@@ -82,7 +93,15 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                     // Greeting Card
                     Card(
                       color: AppTheme.accentGreen,
-                      child: Padding(
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                          ).then((_) => _loadDashboard());
+                        },
+                        child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Row(
                           children: [
@@ -108,6 +127,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                             ),
                           ],
                         ),
+                      ),
                       ),
                     ),
                     const SizedBox(height: 16),

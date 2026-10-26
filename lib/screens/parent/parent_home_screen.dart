@@ -5,6 +5,7 @@ import '../../core/storage/secure_storage.dart';
 import '../../core/theme/app_theme.dart';
 import '../auth/login_screen.dart';
 import '../reports/report_detail_screen.dart';
+import '../profile/profile_screen.dart';
 
 class ParentHomeScreen extends StatefulWidget {
   const ParentHomeScreen({super.key});
@@ -174,6 +175,16 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
             onPressed: _loadData,
           ),
           IconButton(
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Profil Saya',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              ).then((_) => _loadData());
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Keluar Akun',
             onPressed: () async {
@@ -204,7 +215,15 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                     // Header card
                     Card(
                       color: AppTheme.accentGreen,
-                      child: Padding(
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                          ).then((_) => _loadData());
+                        },
+                        child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Row(
                           children: [
@@ -224,6 +243,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                             ),
                           ],
                         ),
+                      ),
                       ),
                     ),
                     const SizedBox(height: 20),

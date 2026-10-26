@@ -7,6 +7,11 @@ class ApiEndpoints {
   static const String logout = '$baseUrl/auth/logout';
   static const String me = '$baseUrl/auth/me';
 
+  // Profile Endpoints
+  static const String profile = '$baseUrl/profile';
+  static const String updateContact = '$baseUrl/profile/contact';
+  static const String updatePassword = '$baseUrl/profile/password';
+
   // Device Tokens (FCM)
   static const String deviceToken = '$baseUrl/devices/token';
 
