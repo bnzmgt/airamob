@@ -1,0 +1,25 @@
+class ApiEndpoints {
+  // Yerd local development URL for Chrome / Web / macOS
+  static const String baseUrl = 'http://airamod.test/api/v1';
+
+  // Auth
+  static const String login = '$baseUrl/auth/login';
+  static const String logout = '$baseUrl/auth/logout';
+  static const String me = '$baseUrl/auth/me';
+
+  // Device Tokens (FCM)
+  static const String deviceToken = '$baseUrl/devices/token';
+
+  // Student Endpoints
+  static const String studentDashboard = '$baseUrl/student/dashboard';
+  static const String studentReports = '$baseUrl/student/reports';
+  static const String studentSafeguarding = '$baseUrl/student/safeguarding/reports';
+
+  // Parent Endpoints
+  static const String parentDashboard = '$baseUrl/parent/dashboard';
+  static const String parentReports = '$baseUrl/parent/reports';
+  static String parentAppreciate(int reportId) => '$baseUrl/parent/reports/$reportId/appreciations';
+
+  // Safeguarding Public Tracking
+  static String trackSafeguarding(String code) => '$baseUrl/safeguarding/track/$code';
+}
