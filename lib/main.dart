@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'core/api/api_endpoints.dart';
 import 'core/storage/secure_storage.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/parent/parent_home_screen.dart';
 import 'screens/student/student_home_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ApiEndpoints.init();
   runApp(const AinaraApp());
 }
 

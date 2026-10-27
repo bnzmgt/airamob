@@ -1,39 +1,79 @@
+import '../storage/secure_storage.dart';
+
 class ApiEndpoints {
-  // Yerd local development URL for Chrome / Web / macOS
-  static const String baseUrl = 'http://airamod.test/api/v1';
+  // Compile-time default URL with fallback to local development
+  // Can be overridden during build: flutter build apk --dart-define=API_BASE_URL=https://your-domain.com/api/v1
+  static const String defaultBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://ainara.dstr.biz.id/api/v1',
+  );
+
+  static String _baseUrl = defaultBaseUrl;
+
+  static String get baseUrl => _baseUrl;
+
+  /// Sanitizes URL to ensure valid format and proper '/api/v1' suffix
+  static String sanitizeBaseUrl(String url) {
+    var clean = url.trim();
+    while (clean.endsWith('/')) {
+      clean = clean.substring(0, clean.length - 1);
+    }
+    if (!clean.endsWith('/api/v1')) {
+      clean = '$clean/api/v1';
+    }
+    return clean;
+  }
+
+  /// Initializes base URL from secure storage if previously configured by user
+  static Future<void> init() async {
+    final stored = await SecureStorage.getBaseUrl();
+    if (stored != null && stored.trim().isNotEmpty) {
+      _baseUrl = sanitizeBaseUrl(stored.trim());
+    } else {
+      _baseUrl = defaultBaseUrl;
+    }
+  }
+
+  /// Sets base URL at runtime (e.g. from Server Settings Dialog)
+  static void setBaseUrl(String url) {
+    _baseUrl = sanitizeBaseUrl(url);
+  }
 
   // Auth
-  static const String login = '$baseUrl/auth/login';
-  static const String logout = '$baseUrl/auth/logout';
-  static const String me = '$baseUrl/auth/me';
+  static String get login => '$baseUrl/auth/login';
+  static String get logout => '$baseUrl/auth/logout';
+  static String get me => '$baseUrl/auth/me';
 
   // Profile Endpoints
-  static const String profile = '$baseUrl/profile';
-  static const String updateContact = '$baseUrl/profile/contact';
-  static const String updatePassword = '$baseUrl/profile/password';
+  static String get profile => '$baseUrl/profile';
+  static String get updateContact => '$baseUrl/profile/contact';
+  static String get updatePassword => '$baseUrl/profile/password';
 
   // Device Tokens (FCM)
-  static const String deviceToken = '$baseUrl/devices/token';
+  static String get deviceToken => '$baseUrl/devices/token';
 
   // Student Endpoints
-  static const String studentDashboard = '$baseUrl/student/dashboard';
-  static const String studentReports = '$baseUrl/student/reports';
+  static String get studentDashboard => '$baseUrl/student/dashboard';
+  static String get studentReports => '$baseUrl/student/reports';
   static String studentReportUpdate(int id) => '$baseUrl/student/reports/$id';
-  static const String studentSafeguarding = '$baseUrl/student/safeguarding/reports';
-  static const String studentMyIncidents = '$baseUrl/student/safeguarding/my-reports';
+  static String get studentSafeguarding => '$baseUrl/student/safeguarding/reports';
+  static String get studentMyIncidents => '$baseUrl/student/safeguarding/my-reports';
 
   // Parent Endpoints
-  static const String parentDashboard = '$baseUrl/parent/dashboard';
-  static const String parentReports = '$baseUrl/parent/reports';
+  static String get parentDashboard => '$baseUrl/parent/dashboard';
+  static String get parentReports => '$baseUrl/parent/reports';
   static String parentAppreciate(int reportId) => '$baseUrl/parent/reports/$reportId/appreciations';
 
   // Parent Child Dedicated Reports & Exports
   static String parentChildReports(int studentId) => '$baseUrl/parent/students/$studentId/reports';
-  static const String parentReportsExportCsv = '$baseUrl/parent/reports/export/csv';
-  static const String parentReportsExportPdf = '$baseUrl/parent/reports/export/pdf';
+  static String get parentReportsExportCsv => '$baseUrl/parent/reports/export/csv';
+  static String get parentReportsExportPdf => '$baseUrl/parent/reports/export/pdf';
   static String parentChildExportCsv(int studentId) => '$baseUrl/parent/students/$studentId/export/csv';
   static String parentChildExportPdf(int studentId) => '$baseUrl/parent/students/$studentId/export/pdf';
 
   // Safeguarding Public Tracking
   static String trackSafeguarding(String code) => '$baseUrl/safeguarding/track/$code';
+
+  // Connectivity Ping Endpoint (Public Tokenless Test)
+  static String get pingCheck => '$baseUrl/safeguarding/track/PING-CHECK';
 }

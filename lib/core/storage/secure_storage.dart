@@ -7,6 +7,20 @@ class SecureStorage {
   static const _keyUserName = 'user_name';
   static const _keyUserEmail = 'user_email';
 
+  static const _keyBaseUrl = 'custom_base_url';
+
+  static Future<void> saveBaseUrl(String url) async {
+    await _storage.write(key: _keyBaseUrl, value: url);
+  }
+
+  static Future<String?> getBaseUrl() async {
+    return await _storage.read(key: _keyBaseUrl);
+  }
+
+  static Future<void> clearBaseUrl() async {
+    await _storage.delete(key: _keyBaseUrl);
+  }
+
   static Future<void> saveAuthSession({
     required String token,
     required String role,
@@ -32,6 +46,9 @@ class SecureStorage {
   }
 
   static Future<void> clearSession() async {
-    await _storage.deleteAll();
+    await _storage.delete(key: _keyToken);
+    await _storage.delete(key: _keyRole);
+    await _storage.delete(key: _keyUserName);
+    await _storage.delete(key: _keyUserEmail);
   }
 }

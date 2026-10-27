@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../../core/api/api_client.dart';
 import '../../core/api/api_endpoints.dart';
 import '../../core/storage/secure_storage.dart';
@@ -80,9 +81,193 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _showServerConfigDialog() async {
+    final controller = TextEditingController(text: ApiEndpoints.baseUrl);
+    String? testStatus;
+    bool isTesting = false;
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Row(
+                children: [
+                  Icon(Icons.dns_outlined, color: AppTheme.primaryGreen),
+                  SizedBox(width: 8),
+                  Text('Pengaturan Server', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'Ubah URL endpoint backend AiNARA sesuai lingkungan koneksi (HP Fisik via Wi-Fi/LAN, Emulator, atau VPS):',
+                      style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Base URL API',
+                        hintText: 'http://192.168.1.x:8000/api/v1',
+                        prefixIcon: Icon(Icons.link),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Preset Lingkungan:',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        ActionChip(
+                          label: const Text('Valet / Web'),
+                          onPressed: () {
+                            setDialogState(() {
+                              controller.text = 'http://airamod.test/api/v1';
+                            });
+                          },
+                        ),
+                        ActionChip(
+                          label: const Text('Android Emulator'),
+                          onPressed: () {
+                            setDialogState(() {
+                              controller.text = 'http://10.0.2.2:8000/api/v1';
+                            });
+                          },
+                        ),
+                        ActionChip(
+                          label: const Text('Localhost:8000'),
+                          onPressed: () {
+                            setDialogState(() {
+                              controller.text = 'http://127.0.0.1:8000/api/v1';
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (testStatus != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: testStatus!.startsWith('✓') ? Colors.green.shade50 : Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: testStatus!.startsWith('✓') ? Colors.green.shade300 : Colors.red.shade300,
+                          ),
+                        ),
+                        child: Text(
+                          testStatus!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: testStatus!.startsWith('✓') ? Colors.green.shade900 : Colors.red.shade900,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                    OutlinedButton.icon(
+                      onPressed: isTesting
+                          ? null
+                          : () async {
+                              setDialogState(() {
+                                isTesting = true;
+                                testStatus = 'Menguji koneksi ke server...';
+                              });
+                              final target = ApiEndpoints.sanitizeBaseUrl(controller.text);
+                              final pingUrl = '$target/safeguarding/track/PING-CHECK';
+                              final sw = Stopwatch()..start();
+                              try {
+                                final res = await http.get(Uri.parse(pingUrl)).timeout(const Duration(seconds: 5));
+                                sw.stop();
+                                setDialogState(() {
+                                  isTesting = false;
+                                  if (res.statusCode == 200 || res.statusCode == 404 || res.statusCode == 422) {
+                                    testStatus = '✓ Terhubung! Respon ${res.statusCode} (${sw.elapsedMilliseconds} ms)';
+                                  } else {
+                                    testStatus = '⚠ Server merespon HTTP ${res.statusCode} (${sw.elapsedMilliseconds} ms)';
+                                  }
+                                });
+                              } catch (e) {
+                                sw.stop();
+                                setDialogState(() {
+                                  isTesting = false;
+                                  testStatus = '✕ Gagal terhubung: $e';
+                                });
+                              }
+                            },
+                      icon: isTesting
+                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.wifi_tethering, size: 16),
+                      label: const Text('Uji Respon Koneksi'),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () async {
+                    await SecureStorage.clearBaseUrl();
+                    ApiEndpoints.setBaseUrl(ApiEndpoints.defaultBaseUrl);
+                    if (context.mounted) {
+                      Navigator.pop(ctx);
+                      setState(() {});
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Server URL dikembalikan ke default.')),
+                      );
+                    }
+                  },
+                  child: const Text('Reset Default', style: TextStyle(color: Colors.red)),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final newUrl = ApiEndpoints.sanitizeBaseUrl(controller.text);
+                    await SecureStorage.saveBaseUrl(newUrl);
+                    ApiEndpoints.setBaseUrl(newUrl);
+                    if (context.mounted) {
+                      Navigator.pop(ctx);
+                      setState(() {});
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Server berhasil diatur ke: $newUrl'),
+                          backgroundColor: AppTheme.primaryGreen,
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Simpan'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.dns_outlined, color: AppTheme.textMuted),
+            tooltip: 'Pengaturan Server Backend',
+            onPressed: _showServerConfigDialog,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -180,6 +365,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   label: const Text(
                     'Lacak Tiket Aduan LANTANG (Tanpa Login)',
                     style: TextStyle(color: AppTheme.primaryGreen),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Active Server Indicator Button
+                Center(
+                  child: TextButton.icon(
+                    onPressed: _showServerConfigDialog,
+                    icon: const Icon(Icons.settings_ethernet, size: 14, color: AppTheme.textMuted),
+                    label: Text(
+                      'Server: ${ApiEndpoints.baseUrl}',
+                      style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               ],
