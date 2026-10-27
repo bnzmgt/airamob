@@ -27,6 +27,13 @@ class ApiEndpoints {
   static const String parentReports = '$baseUrl/parent/reports';
   static String parentAppreciate(int reportId) => '$baseUrl/parent/reports/$reportId/appreciations';
 
+  // Parent Child Dedicated Reports & Exports
+  static String parentChildReports(int studentId) => '$baseUrl/parent/students/$studentId/reports';
+  static const String parentReportsExportCsv = '$baseUrl/parent/reports/export/csv';
+  static const String parentReportsExportPdf = '$baseUrl/parent/reports/export/pdf';
+  static String parentChildExportCsv(int studentId) => '$baseUrl/parent/students/$studentId/export/csv';
+  static String parentChildExportPdf(int studentId) => '$baseUrl/parent/students/$studentId/export/pdf';
+
   // Safeguarding Public Tracking
   static String trackSafeguarding(String code) => '$baseUrl/safeguarding/track/$code';
 }

@@ -91,6 +91,17 @@ class ApiClient {
     }
   }
 
+  static Future<http.Response> getRaw(String url, {bool withAuth = true}) async {
+    final headers = <String, String>{};
+    if (withAuth) {
+      final token = await SecureStorage.getToken();
+      if (token != null) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+    }
+    return await http.get(Uri.parse(url), headers: headers);
+  }
+
   static Future<ApiResponse> delete(String url, Map<String, dynamic>? body, {bool withAuth = true}) async {
     try {
       final headers = await _getHeaders(withAuth: withAuth);
