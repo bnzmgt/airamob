@@ -8,6 +8,10 @@ import '../reports/report_detail_screen.dart';
 import '../safeguarding/track_incident_screen.dart';
 import 'submit_incident_screen.dart';
 import 'submit_report_screen.dart';
+import 'edit_report_screen.dart';
+import 'student_incident_history_screen.dart';
+import 'student_reports_list_screen.dart';
+
 import '../profile/profile_screen.dart';
 
 class StudentHomeScreen extends StatefulWidget {
@@ -190,20 +194,47 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                 ),
                               ],
                               const SizedBox(height: 14),
-                              OutlinedButton.icon(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ReportDetailScreen(
-                                        reportId: todayReport['id'],
-                                        isParent: false,
-                                      ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => ReportDetailScreen(
+                                              reportId: todayReport['id'],
+                                              isParent: false,
+                                            ),
+                                          ),
+                                        ).then((_) => _loadDashboard());
+                                      },
+                                      icon: const Icon(Icons.visibility_outlined, size: 16),
+                                      label: const Text('Detail', style: TextStyle(fontSize: 13)),
                                     ),
-                                  );
-                                },
-                                icon: const Icon(Icons.visibility_outlined, size: 16),
-                                label: const Text('Buka Detail Laporan Hari Ini', style: TextStyle(fontSize: 13)),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () async {
+                                        final res = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => EditReportScreen(report: todayReport),
+                                          ),
+                                        );
+                                        if (res == true) {
+                                          _loadDashboard();
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppTheme.primaryGreen,
+                                      ),
+                                      icon: const Icon(Icons.edit_note, size: 16),
+                                      label: const Text('Edit Laporan', style: TextStyle(fontSize: 13)),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ] else ...[
                               const Text(
@@ -299,6 +330,34 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 10),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(8),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const StudentIncidentHistoryScreen()),
+                                );
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.history, size: 14, color: Color(0xFF1D4ED8)),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Lihat Riwayat Kasus Saya ›',
+                                      style: TextStyle(
+                                        color: Color(0xFF1D4ED8),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -306,9 +365,26 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                     const SizedBox(height: 20),
 
                     // Recent History Header
-                    const Text(
-                      'Riwayat Belajar Terakhir',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Riwayat Belajar Terakhir',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const StudentReportsListScreen()),
+                            ).then((_) => _loadDashboard());
+                          },
+                          child: const Text(
+                            'Lihat Semua ›',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryGreen),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     if (recentReports.isEmpty)

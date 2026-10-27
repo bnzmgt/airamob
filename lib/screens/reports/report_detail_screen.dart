@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/api_endpoints.dart';
 import '../../core/theme/app_theme.dart';
+import '../student/edit_report_screen.dart';
 
 class ReportDetailScreen extends StatefulWidget {
   final int reportId;
@@ -312,6 +313,22 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
       appBar: AppBar(
         title: const Text('Detail Laporan Belajar'),
         actions: [
+          if (!widget.isParent && _report != null)
+            IconButton(
+              icon: const Icon(Icons.edit_note),
+              tooltip: 'Edit Laporan',
+              onPressed: () async {
+                final res = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EditReportScreen(report: _report!),
+                  ),
+                );
+                if (res == true) {
+                  _loadReport();
+                }
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadReport,

@@ -18,7 +18,9 @@ class ApiEndpoints {
   // Student Endpoints
   static const String studentDashboard = '$baseUrl/student/dashboard';
   static const String studentReports = '$baseUrl/student/reports';
+  static String studentReportUpdate(int id) => '$baseUrl/student/reports/$id';
   static const String studentSafeguarding = '$baseUrl/student/safeguarding/reports';
+  static const String studentMyIncidents = '$baseUrl/student/safeguarding/my-reports';
 
   // Parent Endpoints
   static const String parentDashboard = '$baseUrl/parent/dashboard';

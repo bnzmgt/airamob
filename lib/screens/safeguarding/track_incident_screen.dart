@@ -4,7 +4,9 @@ import '../../core/api/api_endpoints.dart';
 import '../../core/theme/app_theme.dart';
 
 class TrackIncidentScreen extends StatefulWidget {
-  const TrackIncidentScreen({super.key});
+  final String? initialTicketCode;
+
+  const TrackIncidentScreen({super.key, this.initialTicketCode});
 
   @override
   State<TrackIncidentScreen> createState() => _TrackIncidentScreenState();
@@ -15,6 +17,23 @@ class _TrackIncidentScreenState extends State<TrackIncidentScreen> {
   bool _isLoading = false;
   Map<String, dynamic>? _ticketData;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialTicketCode != null && widget.initialTicketCode!.isNotEmpty) {
+      _codeController.text = widget.initialTicketCode!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _trackTicket();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
 
   Future<void> _trackTicket() async {
     final code = _codeController.text.trim();
