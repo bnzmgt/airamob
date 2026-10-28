@@ -104,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   source: ImageSource.camera,
                   maxWidth: 800,
                   maxHeight: 800,
-                  imageQuality: 85,
+                  imageQuality: 75,
                 );
                 if (picked != null) {
                   setState(() => _selectedAvatar = picked);
@@ -120,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   source: ImageSource.gallery,
                   maxWidth: 800,
                   maxHeight: 800,
-                  imageQuality: 85,
+                  imageQuality: 75,
                 );
                 if (picked != null) {
                   setState(() => _selectedAvatar = picked);
@@ -309,8 +309,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
 
-    final avatarUrl = _user?['avatar_url'] as String?;
-    if (avatarUrl != null && avatarUrl.startsWith('http')) {
+    final rawAvatarUrl = _user?['avatar_url'] as String?;
+    final avatarUrl = ApiEndpoints.resolveImageUrl(rawAvatarUrl);
+    if (avatarUrl.isNotEmpty && avatarUrl.startsWith('http')) {
       return ClipOval(
         child: Image.network(
           avatarUrl,

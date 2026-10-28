@@ -44,5 +44,39 @@ void main() {
       ApiEndpoints.setBaseUrl(ApiEndpoints.defaultBaseUrl);
       expect(ApiEndpoints.baseUrl, ApiEndpoints.defaultBaseUrl);
     });
+
+    test('resolveImageUrl correctly resolves absolute, relative and data urls', () {
+      ApiEndpoints.setBaseUrl('https://ainara.dstr.biz.id/api/v1');
+
+      // Empty or null
+      expect(ApiEndpoints.resolveImageUrl(null), '');
+      expect(ApiEndpoints.resolveImageUrl(''), '');
+
+      // Already absolute
+      expect(
+        ApiEndpoints.resolveImageUrl('https://ainara.dstr.biz.id/storage/avatars/1.jpg'),
+        'https://ainara.dstr.biz.id/storage/avatars/1.jpg',
+      );
+      expect(
+        ApiEndpoints.resolveImageUrl('http://other.com/pic.png'),
+        'http://other.com/pic.png',
+      );
+
+      // Relative paths
+      expect(
+        ApiEndpoints.resolveImageUrl('/storage/reports/note.jpg'),
+        'https://ainara.dstr.biz.id/storage/reports/note.jpg',
+      );
+      expect(
+        ApiEndpoints.resolveImageUrl('storage/reports/note.jpg'),
+        'https://ainara.dstr.biz.id/storage/reports/note.jpg',
+      );
+
+      // Data URIs
+      expect(
+        ApiEndpoints.resolveImageUrl('data:image/svg+xml;base64,xxxx'),
+        'data:image/svg+xml;base64,xxxx',
+      );
+    });
   });
 }

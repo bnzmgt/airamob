@@ -76,4 +76,23 @@ class ApiEndpoints {
 
   // Connectivity Ping Endpoint (Public Tokenless Test)
   static String get pingCheck => '$baseUrl/safeguarding/track/PING-CHECK';
+
+  /// Resolves an image path or URL into a fully-qualified, reachable HTTP/HTTPS URL.
+  /// Handles absolute URLs (https://...), relative paths (/storage/...), and data URIs.
+  static String resolveImageUrl(String? urlOrPath) {
+    if (urlOrPath == null || urlOrPath.trim().isEmpty) return '';
+    final trimmed = urlOrPath.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
+      return trimmed;
+    }
+
+    try {
+      final cleanPath = trimmed.startsWith('/') ? trimmed : '/$trimmed';
+      final uri = Uri.parse(_baseUrl);
+      final hostUrl = '${uri.scheme}://${uri.host}${uri.hasPort ? ':${uri.port}' : ''}';
+      return '$hostUrl$cleanPath';
+    } catch (_) {
+      return trimmed;
+    }
+  }
 }

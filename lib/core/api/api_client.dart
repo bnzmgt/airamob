@@ -74,13 +74,32 @@ class ApiClient {
       request.fields.addAll(fields);
 
       if (file != null) {
-        final bytes = await file.readAsBytes();
-        final multipartFile = http.MultipartFile.fromBytes(
-          fileField,
-          bytes,
-          filename: file.name,
-        );
-        request.files.add(multipartFile);
+        try {
+          if (file.path.isNotEmpty) {
+            final multipartFile = await http.MultipartFile.fromPath(
+              fileField,
+              file.path,
+              filename: file.name,
+            );
+            request.files.add(multipartFile);
+          } else {
+            final bytes = await file.readAsBytes();
+            final multipartFile = http.MultipartFile.fromBytes(
+              fileField,
+              bytes,
+              filename: file.name,
+            );
+            request.files.add(multipartFile);
+          }
+        } catch (_) {
+          final bytes = await file.readAsBytes();
+          final multipartFile = http.MultipartFile.fromBytes(
+            fileField,
+            bytes,
+            filename: file.name,
+          );
+          request.files.add(multipartFile);
+        }
       }
 
       final streamedResponse = await request.send();
@@ -120,17 +139,42 @@ class ApiClient {
     try {
       final body = jsonDecode(response.body);
       final isSuccess = response.statusCode >= 200 && response.statusCode < 300;
+      
+      String? message;
+      if (body is Map) {
+        if (body['message'] != null) {
+          message = body['message'].toString();
+        } else if (body['errors'] is Map) {
+          final errors = body['errors'] as Map;
+          if (errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              message = firstError.first.toString();
+            } else {
+              message = firstError.toString();
+            }
+          }
+        }
+      }
+
       return ApiResponse(
         success: isSuccess,
         statusCode: response.statusCode,
-        data: body['data'],
-        message: body['message'] ?? (isSuccess ? 'Sukses' : 'Terjadi kesalahan.'),
+        data: body is Map ? body['data'] : null,
+        message: message ?? (isSuccess ? 'Sukses' : 'Terjadi kesalahan (HTTP ${response.statusCode}).'),
       );
     } catch (e) {
+      if (response.statusCode == 413) {
+        return ApiResponse(
+          success: false,
+          statusCode: 413,
+          message: 'Ukuran berkas terlalu besar untuk dikirim ke server (HTTP 413).',
+        );
+      }
       return ApiResponse(
         success: false,
         statusCode: response.statusCode,
-        message: 'Format respon tidak valid: ${response.body}',
+        message: 'Respon server tidak valid (HTTP ${response.statusCode}).',
       );
     }
   }

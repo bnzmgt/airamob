@@ -46,9 +46,9 @@ class _EditReportScreenState extends State<EditReportScreen> {
   Future<void> _pickPhoto(ImageSource source) async {
     final picked = await _picker.pickImage(
       source: source,
-      maxWidth: 1600,
-      maxHeight: 1600,
-      imageQuality: 85,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 75,
     );
 
     if (picked != null) {
@@ -152,7 +152,8 @@ class _EditReportScreenState extends State<EditReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final existingPhotoUrl = widget.report['photo_url'] as String?;
+    final rawPhotoUrl = widget.report['photo_url'] as String?;
+    final existingPhotoUrl = ApiEndpoints.resolveImageUrl(rawPhotoUrl);
     final reportDate = widget.report['report_date'] ?? 'Hari ini';
 
     return Scaffold(
@@ -220,7 +221,7 @@ class _EditReportScreenState extends State<EditReportScreen> {
                     const SizedBox(height: 12),
 
                     // Existing photo preview
-                    if (existingPhotoUrl != null && !_removeExistingPhoto && _selectedPhoto == null) ...[
+                    if (existingPhotoUrl.isNotEmpty && !_removeExistingPhoto && _selectedPhoto == null) ...[
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.network(

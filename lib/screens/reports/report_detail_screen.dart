@@ -625,7 +625,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
             ],
 
             // Photo Evidence Card with Zoom Lightbox
-            if (_report!['photo_url'] != null) ...[
+            if (ApiEndpoints.resolveImageUrl(_report!['photo_url'] as String?).isNotEmpty) ...[
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -641,14 +641,14 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                       ),
                       const SizedBox(height: 12),
                       GestureDetector(
-                        onTap: () => _showImageZoom(_report!['photo_url']),
+                        onTap: () => _showImageZoom(ApiEndpoints.resolveImageUrl(_report!['photo_url'] as String?)),
                         child: Stack(
                           alignment: Alignment.bottomRight,
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: Image.network(
-                                _report!['photo_url'],
+                                ApiEndpoints.resolveImageUrl(_report!['photo_url'] as String?),
                                 height: 220,
                                 width: double.infinity,
                                 fit: BoxFit.cover,

@@ -41,16 +41,58 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
   ];
 
   Future<void> _pickPhoto() async {
-    final picked = await _picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1600,
-      maxHeight: 1600,
-      imageQuality: 85,
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Wrap(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Pilih Sumber Foto Bukti Kejadian',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppTheme.primaryGreen),
+              title: const Text('Ambil dari Kamera'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final picked = await _picker.pickImage(
+                  source: ImageSource.camera,
+                  maxWidth: 1024,
+                  maxHeight: 1024,
+                  imageQuality: 75,
+                );
+                if (picked != null) {
+                  setState(() => _selectedPhoto = picked);
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppTheme.primaryGreen),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final picked = await _picker.pickImage(
+                  source: ImageSource.gallery,
+                  maxWidth: 1024,
+                  maxHeight: 1024,
+                  imageQuality: 75,
+                );
+                if (picked != null) {
+                  setState(() => _selectedPhoto = picked);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
     );
-
-    if (picked != null) {
-      setState(() => _selectedPhoto = picked);
-    }
   }
 
   Future<void> _submitIncident() async {
