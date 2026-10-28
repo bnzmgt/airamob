@@ -71,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(response.message ?? 'Gagal memuat data profil.'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.destructive,
           ),
         );
       }
@@ -92,12 +92,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: EdgeInsets.all(16),
               child: Text(
                 'Pilih Sumber Foto Profil',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary),
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppTheme.primaryGreen),
-              title: const Text('Ambil dari Kamera'),
+              leading: const Icon(Icons.camera_alt, color: AppTheme.primaryBlue),
+              title: const Text('Ambil dari Kamera', style: TextStyle(color: AppTheme.textPrimary)),
               onTap: () async {
                 Navigator.pop(ctx);
                 final picked = await _picker.pickImage(
@@ -112,8 +112,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppTheme.primaryGreen),
-              title: const Text('Pilih dari Galeri'),
+              leading: const Icon(Icons.photo_library, color: AppTheme.primaryBlue),
+              title: const Text('Pilih dari Galeri', style: TextStyle(color: AppTheme.textPrimary)),
               onTap: () async {
                 Navigator.pop(ctx);
                 final picked = await _picker.pickImage(
@@ -170,14 +170,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Data profil kontak berhasil disimpan!'),
-          backgroundColor: AppTheme.primaryGreen,
+          backgroundColor: AppTheme.primaryBlue,
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(res.message ?? 'Gagal memperbarui profil.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.destructive,
         ),
       );
     }
@@ -192,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Semua kolom kata sandi wajib diisi.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.destructive,
         ),
       );
       return;
@@ -202,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Kata sandi baru minimal 6 karakter.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.destructive,
         ),
       );
       return;
@@ -212,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Konfirmasi kata sandi baru tidak sesuai.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.destructive,
         ),
       );
       return;
@@ -240,14 +240,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Kata sandi berhasil diubah!'),
-          backgroundColor: AppTheme.primaryGreen,
+          backgroundColor: AppTheme.primaryBlue,
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(res.message ?? 'Gagal mengubah kata sandi.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.destructive,
         ),
       );
     }
@@ -257,8 +257,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Konfirmasi Keluar'),
-        content: const Text('Apakah Anda yakin ingin keluar dari akun AiNARA?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppTheme.cardBorder),
+        ),
+        title: const Text('Konfirmasi Keluar', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+        content: const Text('Apakah Anda yakin ingin keluar dari akun AiNARA?', style: TextStyle(color: AppTheme.textPrimary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -266,8 +270,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Keluar'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              elevation: 0,
+            ),
+            child: const Text('Keluar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -320,8 +327,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => const CircleAvatar(
             radius: 44,
-            backgroundColor: AppTheme.accentGreen,
-            child: Icon(Icons.person, size: 48, color: AppTheme.primaryGreen),
+            backgroundColor: Color(0xFFEFF6FF),
+            child: Icon(Icons.person, size: 48, color: AppTheme.primaryBlue),
           ),
         ),
       );
@@ -329,8 +336,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return const CircleAvatar(
       radius: 44,
-      backgroundColor: AppTheme.accentGreen,
-      child: Icon(Icons.person, size: 48, color: AppTheme.primaryGreen),
+      backgroundColor: Color(0xFFEFF6FF),
+      child: Icon(Icons.person, size: 48, color: AppTheme.primaryBlue),
     );
   }
 
@@ -341,6 +348,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final isStudent = role == 'student';
 
     return Scaffold(
+      backgroundColor: AppTheme.canvasColor,
       appBar: AppBar(
         title: const Text('Profil & Akun Saya'),
         actions: [
@@ -352,18 +360,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen))
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
           : RefreshIndicator(
               onRefresh: _loadProfile,
-              color: AppTheme.primaryGreen,
+              color: AppTheme.primaryBlue,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Header Profile Card
                     Card(
+                      elevation: 0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
@@ -377,7 +391,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: const BoxDecoration(
-                                      color: AppTheme.primaryGreen,
+                                      color: AppTheme.primaryBlue,
                                       shape: BoxShape.circle,
                                     ),
                                     child: const Icon(
@@ -389,30 +403,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             Text(
                               _user?['name'] ?? 'Pengguna',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textDark),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textPrimary),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               _user?['email'] ?? '',
                               style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 12),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.accentGreen,
+                                    color: const Color(0xFFEFF6FF),
                                     borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: const Color(0xFFBFDBFE)),
                                   ),
                                   child: Text(
                                     isStudent ? 'Siswa' : 'Orang Tua / Wali',
                                     style: const TextStyle(
-                                      color: AppTheme.primaryGreen,
+                                      color: AppTheme.primaryBlue,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
                                     ),
@@ -424,6 +439,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFECFDF5),
                                     borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: const Color(0xFFA7F3D0)),
                                   ),
                                   child: const Text(
                                     '🟢 Aktif',
@@ -437,29 +453,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                             if (isStudent && profile != null) ...[
-                              const SizedBox(height: 12),
-                              const Divider(height: 1),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 16),
+                              const Divider(height: 1, color: AppTheme.cardBorder),
+                              const SizedBox(height: 14),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
                                   Column(
                                     children: [
                                       const Text('NIS / Kode Siswa', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
-                                      const SizedBox(height: 2),
+                                      const SizedBox(height: 3),
                                       Text(
                                         profile['student_code'] ?? '-',
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
                                       ),
                                     ],
                                   ),
+                                  Container(height: 28, width: 1, color: AppTheme.cardBorder),
                                   Column(
                                     children: [
                                       const Text('Kelas Terdaftar', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
-                                      const SizedBox(height: 2),
+                                      const SizedBox(height: 3),
                                       Text(
                                         profile['class_name'] ?? '-',
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
                                       ),
                                     ],
                                   ),
@@ -470,10 +487,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // Contact Update Form Card
                     Card(
+                      elevation: 0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
@@ -481,11 +504,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             const Row(
                               children: [
-                                Icon(Icons.contact_phone, color: AppTheme.primaryGreen, size: 20),
+                                Icon(Icons.contact_phone_outlined, color: AppTheme.primaryBlue, size: 20),
                                 SizedBox(width: 8),
                                 Text(
                                   'Informasi Kontak & Alamat',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textDark),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary),
                                 ),
                               ],
                             ),
@@ -506,7 +529,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               decoration: const InputDecoration(
                                 labelText: 'Alamat Domisili',
                                 hintText: 'Nama jalan, perumahan, kota...',
-                                prefixIcon: Icon(Icons.home, size: 20),
+                                prefixIcon: Icon(Icons.home_outlined, size: 20),
                               ),
                             ),
                             if (_selectedAvatar != null) ...[
@@ -514,23 +537,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.accentGreen,
+                                  color: const Color(0xFFEFF6FF),
                                   borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: const Color(0xFFBFDBFE)),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.check_circle, color: AppTheme.primaryGreen, size: 18),
+                                    const Icon(Icons.check_circle, color: AppTheme.primaryBlue, size: 18),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         'Foto profil baru terpilih: ${_selectedAvatar!.name}',
-                                        style: const TextStyle(fontSize: 12, color: AppTheme.primaryGreen),
+                                        style: const TextStyle(fontSize: 12, color: AppTheme.primaryBlue, fontWeight: FontWeight.w500),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     GestureDetector(
                                       onTap: () => setState(() => _selectedAvatar = null),
-                                      child: const Icon(Icons.close, size: 18, color: Colors.grey),
+                                      child: const Icon(Icons.close, size: 18, color: AppTheme.textMuted),
                                     ),
                                   ],
                                 ),
@@ -539,22 +563,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 16),
                             ElevatedButton(
                               onPressed: _isSavingContact ? null : _saveContact,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primaryBlue,
+                                minimumSize: const Size(double.infinity, 48),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
                               child: _isSavingContact
                                   ? const SizedBox(
                                       width: 20,
                                       height: 20,
                                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                     )
-                                  : const Text('Simpan Perubahan Kontak'),
+                                  : const Text('Simpan Perubahan Kontak', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // Password Update Form Card
                     Card(
+                      elevation: 0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
@@ -562,11 +598,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             const Row(
                               children: [
-                                Icon(Icons.lock_outline, color: AppTheme.primaryGreen, size: 20),
+                                Icon(Icons.lock_outline, color: AppTheme.primaryBlue, size: 20),
                                 SizedBox(width: 8),
                                 Text(
                                   'Ganti Kata Sandi',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textDark),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary),
                                 ),
                               ],
                             ),
@@ -613,7 +649,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ElevatedButton(
                               onPressed: _isSavingPassword ? null : _savePassword,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1E293B),
+                                backgroundColor: AppTheme.textPrimary, // #0F172A Slate 900
+                                minimumSize: const Size(double.infinity, 48),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),
                               child: _isSavingPassword
                                   ? const SizedBox(
@@ -621,25 +660,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       height: 20,
                                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                     )
-                                  : const Text('Perbarui Kata Sandi'),
+                                  : const Text('Perbarui Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // Logout Button Card
                     Card(
+                      elevation: 0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: OutlinedButton.icon(
                           onPressed: _confirmLogout,
-                          icon: const Icon(Icons.logout, color: Colors.red),
-                          label: const Text('Keluar dari Akun', style: TextStyle(color: Colors.red)),
+                          icon: const Icon(Icons.logout, color: Color(0xFFEF4444)),
+                          label: const Text('Keluar dari Akun', style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold)),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.red),
+                            side: const BorderSide(color: Color(0xFFFECDD3)),
+                            backgroundColor: const Color(0xFFFFF1F2),
                             padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
                       ),

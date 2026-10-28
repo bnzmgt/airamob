@@ -84,41 +84,57 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
   }
 
   Widget _buildSentimentBadge(String? sentiment) {
-    Color bg;
-    Color fg;
+    Color dotColor;
+    Color bg = const Color(0xFFF1F5F9);
+    Color fg = AppTheme.textPrimary;
+    Color borderColor = AppTheme.cardBorder;
     String label;
 
     switch (sentiment) {
       case 'positive':
-        bg = const Color(0xFFECFDF5);
-        fg = const Color(0xFF047857);
-        label = '🟢 Positif';
+        dotColor = const Color(0xFF10B981);
+        label = 'Positif';
         break;
       case 'neutral':
-        bg = Colors.blue.shade50;
-        fg = Colors.blue.shade700;
-        label = '🔵 Stabil';
+        dotColor = AppTheme.primaryBlue;
+        label = 'Stabil';
         break;
       case 'negative':
-        bg = Colors.amber.shade50;
-        fg = Colors.amber.shade900;
-        label = '🟠 Evaluasi';
+        dotColor = AppTheme.secondaryTangerine;
+        bg = AppTheme.amberSurface;
+        borderColor = const Color(0xFFFDE68A);
+        fg = AppTheme.amberText;
+        label = 'Evaluasi';
         break;
       default:
-        bg = Colors.grey.shade100;
-        fg = AppTheme.textMuted;
-        label = '⚪ Rutin';
+        dotColor = AppTheme.textMuted;
+        label = 'Rutin';
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor),
       ),
-      child: Text(
-        label,
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: fg),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: BoxDecoration(
+              color: dotColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: fg),
+          ),
+        ],
       ),
     );
   }
@@ -146,12 +162,17 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
             _loadReports(page: 1);
           }
         },
-        backgroundColor: AppTheme.primaryGreen,
-        icon: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: AppTheme.primaryBlue,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: AppTheme.borderBlueActive),
+        ),
+        icon: const Icon(Icons.add, color: Colors.white, size: 20),
         label: const Text('Lapor Hari Ini', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen))
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
           : _errorMessage != null
               ? Center(
                   child: Padding(
@@ -159,12 +180,13 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                        const Icon(Icons.error_outline, size: 48, color: AppTheme.destructive),
                         const SizedBox(height: 12),
-                        Text(_errorMessage!, textAlign: TextAlign.center),
+                        Text(_errorMessage!, textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.textPrimary)),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () => _loadReports(page: 1),
+                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
                           child: const Text('Coba Lagi'),
                         ),
                       ],
@@ -173,7 +195,7 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
                 )
               : RefreshIndicator(
                   onRefresh: () => _loadReports(page: 1),
-                  color: AppTheme.primaryGreen,
+                  color: AppTheme.primaryBlue,
                   child: _reports.isEmpty
                       ? const Center(
                           child: Padding(
@@ -181,11 +203,11 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.menu_book, size: 64, color: AppTheme.textMuted),
+                                Icon(Icons.menu_book_outlined, size: 64, color: AppTheme.primaryBlue),
                                 SizedBox(height: 16),
                                 Text(
                                   'Belum ada riwayat laporan belajar.',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary),
                                 ),
                                 SizedBox(height: 6),
                                 Text(
@@ -210,7 +232,7 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
                                   children: [
                                     Text(
                                       'Total Laporan Terarsip: $_totalReports',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textPrimary),
                                     ),
                                     Text(
                                       'Halaman $_currentPage dari $_lastPage',
@@ -226,7 +248,7 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
                               return const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 16),
                                 child: Center(
-                                  child: CircularProgressIndicator(color: AppTheme.primaryGreen, strokeWidth: 2),
+                                  child: CircularProgressIndicator(color: AppTheme.primaryBlue, strokeWidth: 2),
                                 ),
                               );
                             }
@@ -236,9 +258,14 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
                             final appreciations = (report['appreciations'] as List?) ?? [];
 
                             return Card(
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                side: const BorderSide(color: AppTheme.cardBorder),
+                              ),
                               margin: const EdgeInsets.only(bottom: 12),
                               child: InkWell(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(14),
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -260,11 +287,11 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
                                         children: [
                                           Row(
                                             children: [
-                                              const Icon(Icons.event_note, size: 16, color: AppTheme.primaryGreen),
+                                              const Icon(Icons.event_note, size: 16, color: AppTheme.primaryBlue),
                                               const SizedBox(width: 6),
                                               Text(
                                                 report['report_date'] ?? '-',
-                                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
                                               ),
                                             ],
                                           ),
@@ -276,9 +303,9 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
                                         report['content'] ?? '-',
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 14, height: 1.4, color: AppTheme.textDark),
+                                        style: const TextStyle(fontSize: 14, height: 1.4, color: AppTheme.textPrimary),
                                       ),
-                                      const SizedBox(height: 10),
+                                      const SizedBox(height: 12),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -286,36 +313,49 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
                                             children: [
                                               if (hasPhoto) ...[
                                                 Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.grey.shade100,
+                                                    color: const Color(0xFFF1F5F9),
                                                     borderRadius: BorderRadius.circular(6),
+                                                    border: Border.all(color: AppTheme.cardBorder),
                                                   ),
                                                   child: const Row(
                                                     children: [
-                                                      Icon(Icons.photo_camera, size: 12, color: AppTheme.primaryGreen),
+                                                      Icon(Icons.photo_camera_outlined, size: 12, color: AppTheme.primaryBlue),
                                                       SizedBox(width: 4),
-                                                      Text('Foto', style: TextStyle(fontSize: 11, color: AppTheme.textDark)),
+                                                      Text('Foto', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
                                                     ],
                                                   ),
                                                 ),
                                                 const SizedBox(width: 6),
                                               ],
                                               if (appreciations.isNotEmpty) ...[
-                                                Text(appreciations.first['emoji'] ?? '❤️', style: const TextStyle(fontSize: 16)),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  '${appreciations.length} Apresiasi',
-                                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.pink),
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFFFDF2F8),
+                                                    borderRadius: BorderRadius.circular(6),
+                                                    border: Border.all(color: const Color(0xFFFBCFE8)),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(appreciations.first['emoji'] ?? '❤️', style: const TextStyle(fontSize: 13)),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        '${appreciations.length} Apresiasi',
+                                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFDB2777)),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ],
                                             ],
                                           ),
                                           const Row(
                                             children: [
-                                              Text('Detail', style: TextStyle(fontSize: 12, color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
+                                              Text('Detail', style: TextStyle(fontSize: 12, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
                                               SizedBox(width: 2),
-                                              Icon(Icons.chevron_right, size: 16, color: AppTheme.primaryGreen),
+                                              Icon(Icons.chevron_right, size: 16, color: AppTheme.primaryBlue),
                                             ],
                                           ),
                                         ],

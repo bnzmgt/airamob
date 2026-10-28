@@ -44,40 +44,56 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
   }
 
   Widget _buildStatusBadge(String? status, String? label) {
-    Color bg;
-    Color fg;
+    Color dotColor;
+    const bg = Color(0xFFF1F5F9);
+    const fg = AppTheme.textPrimary;
 
     switch (status) {
       case 'submitted':
-        bg = const Color(0xFFFEF3C7);
-        fg = const Color(0xFF92400E);
+        dotColor = AppTheme.secondaryTangerine;
+        label = label ?? 'Laporan Masuk';
         break;
       case 'investigating':
-        bg = const Color(0xFFEEF2FF);
-        fg = const Color(0xFF3730A3);
+        dotColor = AppTheme.primaryBlue;
+        label = label ?? 'Investigasi';
         break;
       case 'action_taken':
-        bg = const Color(0xFFFFEDD5);
-        fg = const Color(0xFF9A3412);
+        dotColor = AppTheme.secondaryTangerine;
+        label = label ?? 'Tindakan';
         break;
       case 'resolved':
-        bg = const Color(0xFFECFDF5);
-        fg = const Color(0xFF065F46);
+        dotColor = const Color(0xFF10B981);
+        label = label ?? 'Selesai';
         break;
       default:
-        bg = Colors.grey.shade100;
-        fg = AppTheme.textMuted;
+        dotColor = AppTheme.textMuted;
+        label = label ?? status ?? 'Diproses';
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.cardBorder),
       ),
-      child: Text(
-        label ?? status ?? 'Diproses',
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: fg),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: BoxDecoration(
+              color: dotColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: fg),
+          ),
+        ],
       ),
     );
   }
@@ -104,15 +120,17 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
             _loadIncidents();
           }
         },
-        backgroundColor: const Color(0xFFE11D48),
-        icon: const Icon(Icons.shield, color: Colors.white),
+        backgroundColor: const Color(0xFFEF4444),
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        icon: const Icon(Icons.shield, color: Colors.white, size: 18),
         label: const Text('Buat Aduan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen))
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
           : RefreshIndicator(
               onRefresh: _loadIncidents,
-              color: AppTheme.primaryGreen,
+              color: AppTheme.primaryBlue,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
@@ -123,8 +141,8 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFFBEB),
-                        borderRadius: BorderRadius.circular(12),
+                        color: AppTheme.amberSurface,
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: const Color(0xFFFDE68A)),
                       ),
                       child: Row(
@@ -138,14 +156,14 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                               children: [
                                 const Text(
                                   'Catatan Privasi & Laporan Anonim:',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF92400E)),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.amberText),
                                 ),
                                 const SizedBox(height: 4),
                                 const Text(
                                   'Hanya laporan bermode "Kerahasiaan Terjaga" yang terdata di sini. Untuk mengecek status aduan berstatus "Anonim Total", gunakan tombol Lacak Tiket.',
-                                  style: TextStyle(fontSize: 12, height: 1.4, color: Color(0xFF78350F)),
+                                  style: TextStyle(fontSize: 12, height: 1.4, color: AppTheme.amberText),
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 10),
                                 OutlinedButton.icon(
                                   onPressed: () {
                                     Navigator.push(
@@ -154,11 +172,12 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                                     );
                                   },
                                   icon: const Icon(Icons.search, size: 14),
-                                  label: const Text('Lacak Tiket Bebas (#SA)', style: TextStyle(fontSize: 12)),
+                                  label: const Text('Lacak Tiket Bebas (#SA)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: const Color(0xFF92400E),
-                                    side: const BorderSide(color: Color(0xFFFCD34D)),
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    foregroundColor: AppTheme.secondaryTangerine,
+                                    side: const BorderSide(color: AppTheme.secondaryTangerine),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                   ),
                                 ),
                               ],
@@ -175,21 +194,26 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                         child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
                       )
                     else if (_incidents.isEmpty)
-                      const Card(
-                        child: Padding(
+                      Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: const BorderSide(color: AppTheme.cardBorder),
+                        ),
+                        child: const Padding(
                           padding: EdgeInsets.all(32),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               CircleAvatar(
                                 radius: 30,
-                                backgroundColor: Color(0xFFFFE4E6),
-                                child: Icon(Icons.verified_user_outlined, size: 32, color: Color(0xFFE11D48)),
+                                backgroundColor: Color(0xFFEFF6FF),
+                                child: Icon(Icons.verified_user_outlined, size: 32, color: AppTheme.primaryBlue),
                               ),
                               SizedBox(height: 16),
                               Text(
                                 'Belum Ada Aduan Terdaftar',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary),
                               ),
                               SizedBox(height: 6),
                               Text(
@@ -212,9 +236,14 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                         final resolutionNotes = item['resolution_notes'];
 
                         return Card(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            side: const BorderSide(color: AppTheme.cardBorder),
+                          ),
                           margin: const EdgeInsets.only(bottom: 12),
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(14),
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -234,9 +263,9 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: Colors.grey.shade100,
+                                          color: const Color(0xFFF1F5F9),
                                           borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: Colors.grey.shade300),
+                                          border: Border.all(color: AppTheme.cardBorder),
                                         ),
                                         child: Text(
                                           ticketCode,
@@ -244,7 +273,7 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                                             fontFamily: 'monospace',
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
-                                            color: AppTheme.textDark,
+                                            color: AppTheme.textPrimary,
                                           ),
                                         ),
                                       ),
@@ -255,14 +284,15 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                                   Row(
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFEFF6FF),
                                           borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: const Color(0xFFBFDBFE)),
                                         ),
                                         child: Text(
                                           'Kategori: $categoryLabel',
-                                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1D4ED8)),
+                                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
                                         ),
                                       ),
                                       const SizedBox(width: 8),
@@ -272,38 +302,38 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 10),
                                   Text(
                                     item['description'] ?? '-',
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 13, height: 1.4, color: AppTheme.textDark),
+                                    style: const TextStyle(fontSize: 13, height: 1.4, color: AppTheme.textPrimary),
                                   ),
                                   if (resolutionNotes != null && resolutionNotes.toString().isNotEmpty) ...[
-                                    const SizedBox(height: 8),
+                                    const SizedBox(height: 10),
                                     Container(
-                                      padding: const EdgeInsets.all(10),
+                                      padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF0FDF4),
+                                        color: AppTheme.canvasColor,
                                         borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: const Color(0xFFBBF7D0)),
+                                        border: Border.all(color: AppTheme.cardBorder),
                                       ),
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          const Text('📋', style: TextStyle(fontSize: 14)),
-                                          const SizedBox(width: 6),
+                                          const Icon(Icons.assignment_outlined, size: 16, color: AppTheme.primaryBlue),
+                                          const SizedBox(width: 8),
                                           Expanded(
                                             child: Text(
-                                              'Catatan Guru BK: $resolutionNotes',
-                                              style: const TextStyle(fontSize: 12, color: Color(0xFF166534)),
+                                              'Catatan Guru BK / TPPK: $resolutionNotes',
+                                              style: const TextStyle(fontSize: 12, color: AppTheme.textPrimary, height: 1.4),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
                                   ],
-                                  const Divider(height: 20),
+                                  const Divider(height: 24, color: AppTheme.cardBorder),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -318,11 +348,11 @@ class _StudentIncidentHistoryScreenState extends State<StudentIncidentHistoryScr
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: Color(0xFFE11D48),
+                                              color: AppTheme.primaryBlue,
                                             ),
                                           ),
                                           SizedBox(width: 4),
-                                          Icon(Icons.arrow_forward, size: 14, color: Color(0xFFE11D48)),
+                                          Icon(Icons.arrow_forward, size: 14, color: AppTheme.primaryBlue),
                                         ],
                                       ),
                                     ],

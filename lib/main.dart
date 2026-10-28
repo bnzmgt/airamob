@@ -68,7 +68,7 @@ class _AuthGateState extends State<AuthGate> {
     if (_isLoading) {
       return const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(color: AppTheme.primaryGreen),
+          child: CircularProgressIndicator(color: AppTheme.primaryBlue),
         ),
       );
     }

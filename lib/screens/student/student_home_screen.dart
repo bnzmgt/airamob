@@ -96,9 +96,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                   children: [
                     // Greeting Card
                     Card(
-                      color: AppTheme.accentGreen,
+                      color: Colors.white,
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -106,40 +106,55 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                           ).then((_) => _loadDashboard());
                         },
                         child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            const CircleAvatar(
-                              backgroundColor: AppTheme.primaryGreen,
-                              child: Icon(Icons.person, color: Colors.white),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Assalamu’alaikum,',
-                                    style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
-                                  ),
-                                  Text(
-                                    _studentName,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                  ),
-                                ],
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppTheme.primaryBlue, width: 2),
+                                ),
+                                child: const CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: AppTheme.surfaceTint,
+                                  child: Icon(Icons.person, color: AppTheme.primaryBlue, size: 22),
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Assalamu’alaikum,',
+                                      style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _studentName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: AppTheme.textPrimary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.chevron_right, color: AppTheme.textMuted, size: 20),
+                            ],
+                          ),
                         ),
-                      ),
                       ),
                     ),
                     const SizedBox(height: 16),
 
                     // Today's Report Status Card
                     Card(
+                      color: Colors.white,
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(18),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -148,20 +163,28 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                               children: [
                                 const Text(
                                   'Laporan Belajar Hari Ini',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: AppTheme.textPrimary,
+                                  ),
                                 ),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: isSubmittedToday ? AppTheme.accentGreen : Colors.amber.shade50,
-                                    borderRadius: BorderRadius.circular(20),
+                                    color: isSubmittedToday ? AppTheme.surfaceTint : AppTheme.amberSurface,
+                                    borderRadius: BorderRadius.circular(9999),
+                                    border: Border.all(
+                                      color: isSubmittedToday ? AppTheme.borderDefault : AppTheme.borderAmber,
+                                    ),
                                   ),
                                   child: Text(
-                                    isSubmittedToday ? '✓ Sudah Kirim' : '⚠ Belum Lapor',
+                                    isSubmittedToday ? '● Sudah Kirim' : '● Belum Lapor',
                                     style: TextStyle(
-                                      color: isSubmittedToday ? AppTheme.primaryGreen : Colors.amber.shade900,
+                                      color: isSubmittedToday ? AppTheme.success : AppTheme.secondaryTangerine,
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 12,
+                                      fontSize: 11,
+                                      letterSpacing: 0.2,
                                     ),
                                   ),
                                 ),
@@ -173,24 +196,36 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                 todayReport['content'] ?? '',
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: AppTheme.textDark, height: 1.4),
+                                style: const TextStyle(color: AppTheme.textPrimary, height: 1.45, fontSize: 13),
                               ),
                               if ((todayReport['appreciations'] as List?)?.isNotEmpty ?? false) ...[
-                                const Divider(height: 20),
-                                Row(
-                                  children: [
-                                    Text(
-                                      (todayReport['appreciations'][0]['emoji'] ?? '❤️') as String,
-                                      style: const TextStyle(fontSize: 18),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        'Apresiasi Ortu: "${todayReport['appreciations'][0]['message'] ?? 'Semangat belajarnya!'}"',
-                                        style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                                const SizedBox(height: 10),
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.surfaceTint,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: AppTheme.borderDefault),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        (todayReport['appreciations'][0]['emoji'] ?? '❤️') as String,
+                                        style: const TextStyle(fontSize: 18),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          'Apresiasi: "${todayReport['appreciations'][0]['message'] ?? 'Semangat belajarnya!'}"',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontStyle: FontStyle.italic,
+                                            color: AppTheme.textSecondary,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                               const SizedBox(height: 14),
@@ -228,7 +263,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                         }
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppTheme.primaryGreen,
+                                        backgroundColor: AppTheme.primaryBlue,
                                       ),
                                       icon: const Icon(Icons.edit_note, size: 16),
                                       label: const Text('Edit Laporan', style: TextStyle(fontSize: 13)),
@@ -239,7 +274,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                             ] else ...[
                               const Text(
                                 'Kamu belum mengisi laporan belajar hari ini. Yuk bagikan apa yang sudah kamu pelajari!',
-                                style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                                style: TextStyle(color: AppTheme.textSecondary, fontSize: 13, height: 1.4),
                               ),
                               const SizedBox(height: 16),
                               ElevatedButton.icon(
@@ -252,6 +287,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                     _loadDashboard();
                                   }
                                 },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.secondaryTangerine,
+                                  foregroundColor: Colors.white,
+                                ),
                                 icon: const Icon(Icons.edit_note),
                                 label: const Text('Isi Laporan Hari Ini'),
                               ),
@@ -262,103 +301,111 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // LANTANG Safeguarding Card
-                    Card(
-                      color: const Color(0xFFEFF6FF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: const BorderSide(color: Color(0xFFBFDBFE)),
+                    // LANTANG Safeguarding Quick Card (with 3px left accent border)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppTheme.borderDefault),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Row(
-                              children: [
-                                Icon(Icons.shield_outlined, color: Color(0xFF1D4ED8)),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Layanan Perlindungan LANTANG',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1E3A8A),
-                                    fontSize: 14,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              left: BorderSide(color: AppTheme.primaryBlue, width: 3),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Row(
+                                children: [
+                                  Icon(Icons.shield_outlined, color: AppTheme.primaryBlue, size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Layanan Perlindungan LANTANG',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.textPrimary,
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              'Mengalami atau melihat perundungan? Ceritakan secara aman, rahasia, atau anonim total.',
-                              style: TextStyle(color: Color(0xFF3B82F6), fontSize: 12),
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton.icon(
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              const Text(
+                                'Mengalami atau melihat perundungan? Ceritakan secara aman, rahasia, atau anonim total.',
+                                style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, height: 1.4),
+                              ),
+                              const SizedBox(height: 14),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (_) => const SubmitIncidentScreen()),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppTheme.primaryBlue,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                      ),
+                                      icon: const Icon(Icons.add_moderator, size: 16),
+                                      label: const Text('Buat Pengaduan', style: TextStyle(fontSize: 13)),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  OutlinedButton(
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (_) => const SubmitIncidentScreen()),
+                                        MaterialPageRoute(builder: (_) => const TrackIncidentScreen()),
                                       );
                                     },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF2563EB),
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: AppTheme.primaryBlue,
+                                      side: const BorderSide(color: AppTheme.borderDefault),
+                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                     ),
-                                    icon: const Icon(Icons.add_moderator, size: 18),
-                                    label: const Text('Buat Pengaduan', style: TextStyle(fontSize: 13)),
+                                    child: const Text('Lacak Tiket', style: TextStyle(fontSize: 13)),
                                   ),
-                                ),
-                                const SizedBox(width: 10),
-                                OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => const TrackIncidentScreen()),
-                                    );
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: const Color(0xFF1D4ED8),
-                                    side: const BorderSide(color: Color(0xFF93C5FD)),
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                  ),
-                                  child: const Text('Lacak Tiket', style: TextStyle(fontSize: 13)),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            InkWell(
-                              borderRadius: BorderRadius.circular(8),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const StudentIncidentHistoryScreen()),
-                                );
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.history, size: 14, color: Color(0xFF1D4ED8)),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'Lihat Riwayat Kasus Saya ›',
-                                      style: TextStyle(
-                                        color: Color(0xFF1D4ED8),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              InkWell(
+                                borderRadius: BorderRadius.circular(8),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const StudentIncidentHistoryScreen()),
+                                  );
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 4),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.history, size: 14, color: AppTheme.primaryBlue),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'Lihat Riwayat Kasus Saya ›',
+                                        style: TextStyle(
+                                          color: AppTheme.primaryBlue,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -370,7 +417,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                       children: [
                         const Text(
                           'Riwayat Belajar Terakhir',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: AppTheme.textPrimary,
+                          ),
                         ),
                         TextButton(
                           onPressed: () {
@@ -381,7 +432,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                           },
                           child: const Text(
                             'Lihat Semua ›',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryGreen),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
                           ),
                         ),
                       ],
@@ -414,15 +465,19 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                   ),
                                 );
                               },
-                              leading: const CircleAvatar(
-                                backgroundColor: AppTheme.accentGreen,
-                                child: Icon(Icons.book, color: AppTheme.primaryGreen),
+                              leading: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.surfaceTint,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.book_outlined, color: AppTheme.primaryBlue, size: 20),
                               ),
                               title: Text(
                                 report['content'] ?? '',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                               ),
                               subtitle: Text(
                                 report['report_date'] ?? '',
@@ -434,10 +489,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                   if ((report['appreciations'] as List?)?.isNotEmpty ?? false)
                                     Text(
                                       report['appreciations'][0]['emoji'] ?? '❤️',
-                                      style: const TextStyle(fontSize: 20),
+                                      style: const TextStyle(fontSize: 18),
                                     ),
                                   const SizedBox(width: 4),
-                                  const Icon(Icons.chevron_right, color: Colors.grey),
+                                  const Icon(Icons.chevron_right, color: AppTheme.textMuted, size: 18),
                                 ],
                               ),
                             ),

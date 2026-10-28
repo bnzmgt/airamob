@@ -146,14 +146,14 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('File ${ext.toUpperCase()} berhasil diunduh: $filename'),
-            backgroundColor: AppTheme.primaryGreen,
+            backgroundColor: AppTheme.primaryBlue,
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Gagal mengunduh berkas (Status: ${res.statusCode})'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.destructive,
           ),
         );
       }
@@ -162,7 +162,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Terjadi kesalahan saat unduh: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.destructive,
           ),
         );
       }
@@ -188,8 +188,11 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text('Apresiasi Belajar $studentName', style: const TextStyle(fontSize: 16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: AppTheme.cardBorder),
+          ),
+          title: Text('Apresiasi Belajar $studentName', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -205,9 +208,9 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppTheme.accentGreen : Colors.transparent,
+                        color: isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
                         border: Border.all(
-                          color: isSelected ? AppTheme.primaryGreen : Colors.grey.shade300,
+                          color: isSelected ? AppTheme.primaryBlue : AppTheme.cardBorder,
                           width: isSelected ? 2 : 1,
                         ),
                         borderRadius: BorderRadius.circular(12),
@@ -216,7 +219,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                         children: [
                           Text(r['emoji']!, style: const TextStyle(fontSize: 22)),
                           const SizedBox(height: 2),
-                          Text(r['label']!, style: const TextStyle(fontSize: 10)),
+                          Text(r['label']!, style: TextStyle(fontSize: 10, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? AppTheme.primaryBlue : AppTheme.textPrimary)),
                         ],
                       ),
                     ),
@@ -257,7 +260,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Apresiasi berhasil dikirim dan ternotifikasi ke ananda!'),
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.primaryBlue,
                     ),
                   );
                   _loadData();
@@ -265,11 +268,12 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(res.message ?? 'Gagal mengirim apresiasi'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppTheme.destructive,
                     ),
                   );
                 }
               },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
               child: const Text('Kirim'),
             ),
           ],
@@ -343,10 +347,10 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         ],
       ),
       body: _isLoading && _children.isEmpty
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen))
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
           : RefreshIndicator(
               onRefresh: _loadData,
-              color: AppTheme.primaryGreen,
+              color: AppTheme.primaryBlue,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
@@ -355,9 +359,14 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                   children: [
                     // Header card
                     Card(
-                      color: AppTheme.accentGreen,
+                      elevation: 0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                      ),
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -369,19 +378,20 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                           child: Row(
                             children: [
                               const CircleAvatar(
-                                backgroundColor: AppTheme.primaryGreen,
-                                child: Icon(Icons.family_restroom, color: Colors.white),
+                                backgroundColor: Color(0xFFEFF6FF),
+                                child: Icon(Icons.family_restroom, color: AppTheme.primaryBlue),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Bapak / Ibu,', style: TextStyle(color: Colors.grey.shade700, fontSize: 12)),
-                                    Text(_parentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                    const Text('Bapak / Ibu,', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+                                    Text(_parentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary)),
                                   ],
                                 ),
                               ),
+                              const Icon(Icons.chevron_right, size: 20, color: AppTheme.textMuted),
                             ],
                           ),
                         ),
@@ -393,34 +403,46 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Ananda yang Terhubung', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                        Text('${_children.length} Siswa', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+                        const Text('Ananda yang Terhubung', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppTheme.cardBorder),
+                          ),
+                          child: Text('${_children.length} Siswa', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     ..._children.map((child) {
                       final isSubmitted = child['is_submitted_today'] == true;
 
                       return Card(
+                        elevation: 0,
                         margin: const EdgeInsets.only(bottom: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: const BorderSide(color: AppTheme.cardBorder),
+                        ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(14),
                           onTap: () => _navigateToChildReports(child),
                           child: Padding(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(14),
                             child: Row(
                               children: [
-                                CircleAvatar(
-                                  backgroundColor: Colors.grey.shade200,
-                                  child: const Icon(Icons.school, color: AppTheme.primaryGreen),
+                                const CircleAvatar(
+                                  backgroundColor: Color(0xFFEFF6FF),
+                                  child: Icon(Icons.school_outlined, color: AppTheme.primaryBlue),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(child['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                                      Text(child['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary)),
                                       const SizedBox(height: 2),
                                       Text(
                                         'Kelas ${child['class_name'] ?? '-'} • ${child['student_code'] ?? ''}',
@@ -433,29 +455,44 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: isSubmitted ? AppTheme.accentGreen : Colors.amber.shade50,
+                                        color: isSubmitted ? const Color(0xFFF1F5F9) : AppTheme.amberSurface,
                                         borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(color: isSubmitted ? AppTheme.cardBorder : const Color(0xFFFDE68A)),
                                       ),
-                                      child: Text(
-                                        isSubmitted ? '✓ Sudah Lapor' : '⚠ Belum Lapor',
-                                        style: TextStyle(
-                                          color: isSubmitted ? AppTheme.primaryGreen : Colors.amber.shade900,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11,
-                                        ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            width: 6,
+                                            height: 6,
+                                            decoration: BoxDecoration(
+                                              color: isSubmitted ? const Color(0xFF10B981) : AppTheme.secondaryTangerine,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            isSubmitted ? 'Sudah Lapor' : 'Belum Lapor',
+                                            style: TextStyle(
+                                              color: isSubmitted ? AppTheme.textPrimary : AppTheme.amberText,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 6),
                                     const Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
                                           'Riwayat & Rekap',
-                                          style: TextStyle(fontSize: 11, color: AppTheme.primaryGreen, fontWeight: FontWeight.bold),
+                                          style: TextStyle(fontSize: 11, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
                                         ),
-                                        Icon(Icons.chevron_right, size: 14, color: AppTheme.primaryGreen),
+                                        Icon(Icons.chevron_right, size: 14, color: AppTheme.primaryBlue),
                                       ],
                                     ),
                                   ],
@@ -470,14 +507,17 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
 
                     // Reports feed header & filter section
                     Card(
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(14),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Text('Filter Riwayat & Ekspor Laporan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                            const Text('Filter Riwayat & Ekspor Laporan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textPrimary)),
                             const SizedBox(height: 10),
 
                             // Student selector if multiple children
@@ -487,7 +527,10 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                 decoration: InputDecoration(
                                   isDense: true,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(color: AppTheme.cardBorder),
+                                  ),
                                   labelText: 'Pilih Siswa',
                                 ),
                                 items: [
@@ -514,16 +557,17 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: _pickFromDate,
-                                    icon: const Icon(Icons.calendar_today, size: 14),
+                                    icon: const Icon(Icons.calendar_today, size: 14, color: AppTheme.primaryBlue),
                                     label: Text(
                                       _fromDate != null ? _formatDate(_fromDate!) : 'Dari Tanggal',
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: _fromDate != null ? Colors.black87 : AppTheme.textMuted,
+                                        color: _fromDate != null ? AppTheme.textPrimary : AppTheme.textMuted,
                                       ),
                                     ),
                                     style: OutlinedButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                      side: const BorderSide(color: AppTheme.cardBorder),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                   ),
@@ -532,16 +576,17 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: _pickToDate,
-                                    icon: const Icon(Icons.event, size: 14),
+                                    icon: const Icon(Icons.event, size: 14, color: AppTheme.primaryBlue),
                                     label: Text(
                                       _toDate != null ? _formatDate(_toDate!) : 'Sampai Tanggal',
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: _toDate != null ? Colors.black87 : AppTheme.textMuted,
+                                        color: _toDate != null ? AppTheme.textPrimary : AppTheme.textMuted,
                                       ),
                                     ),
                                     style: OutlinedButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                      side: const BorderSide(color: AppTheme.cardBorder),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                   ),
@@ -555,13 +600,13 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                 alignment: Alignment.centerRight,
                                 child: TextButton.icon(
                                   onPressed: _resetFilters,
-                                  icon: const Icon(Icons.clear, size: 14, color: Colors.grey),
-                                  label: const Text('Reset Filter', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  icon: const Icon(Icons.clear, size: 14, color: AppTheme.textMuted),
+                                  label: const Text('Reset Filter', style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
                                 ),
                               ),
                             ],
 
-                            const Divider(height: 18),
+                            const Divider(height: 20, color: AppTheme.cardBorder),
 
                             // Export buttons
                             Row(
@@ -569,12 +614,12 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: _isExporting ? null : () => _exportData(true),
-                                    icon: const Icon(Icons.picture_as_pdf, size: 15, color: Colors.red),
-                                    label: const Text('Cetak PDF', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    icon: const Icon(Icons.picture_as_pdf_outlined, size: 15, color: Color(0xFFEF4444)),
+                                    label: const Text('Cetak PDF', style: TextStyle(color: Color(0xFFEF4444), fontSize: 12, fontWeight: FontWeight.bold)),
                                     style: OutlinedButton.styleFrom(
                                       side: const BorderSide(color: Color(0xFFFECDD3)),
                                       backgroundColor: const Color(0xFFFFF1F2),
-                                      padding: const EdgeInsets.symmetric(vertical: 9),
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                   ),
@@ -583,12 +628,12 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: _isExporting ? null : () => _exportData(false),
-                                    icon: const Icon(Icons.table_chart, size: 15, color: AppTheme.primaryGreen),
-                                    label: const Text('Export CSV', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    icon: const Icon(Icons.table_chart_outlined, size: 15, color: AppTheme.primaryBlue),
+                                    label: const Text('Export CSV', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 12, fontWeight: FontWeight.bold)),
                                     style: OutlinedButton.styleFrom(
-                                      side: BorderSide(color: AppTheme.primaryGreen.withOpacity(0.3)),
-                                      backgroundColor: AppTheme.accentGreen,
-                                      padding: const EdgeInsets.symmetric(vertical: 9),
+                                      side: const BorderSide(color: Color(0xFFBFDBFE)),
+                                      backgroundColor: const Color(0xFFEFF6FF),
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                   ),
@@ -599,12 +644,12 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Feed Laporan Belajar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                        const Text('Feed Laporan Belajar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary)),
                         Text('${_reports.length} Laporan', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
                       ],
                     ),
@@ -613,20 +658,20 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                     if (_reports.isEmpty && !_isLoading)
                       Card(
                         elevation: 0,
-                        color: Colors.grey.shade50,
+                        color: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
-                          side: BorderSide(color: Colors.grey.shade200),
+                          side: const BorderSide(color: AppTheme.cardBorder),
                         ),
                         child: const Padding(
                           padding: EdgeInsets.symmetric(vertical: 36, horizontal: 20),
                           child: Column(
                             children: [
-                              Icon(Icons.description_outlined, size: 48, color: Colors.grey),
+                              Icon(Icons.description_outlined, size: 48, color: AppTheme.textMuted),
                               SizedBox(height: 10),
                               Text(
                                 'Belum ada laporan dari ananda',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.grey),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
                               ),
                               SizedBox(height: 4),
                               Text(
@@ -645,8 +690,12 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                         final hasPhoto = report['photo_url'] != null;
 
                         return Card(
+                          elevation: 0,
                           margin: const EdgeInsets.only(bottom: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            side: const BorderSide(color: AppTheme.cardBorder),
+                          ),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(14),
                             onTap: () => _navigateToReportDetail(report['id']),
@@ -658,11 +707,11 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(studentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                                      Text(studentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary)),
                                       Row(
                                         children: [
                                           if (hasPhoto) ...[
-                                            const Icon(Icons.photo_camera, size: 14, color: AppTheme.primaryGreen),
+                                            const Icon(Icons.photo_camera_outlined, size: 14, color: AppTheme.primaryBlue),
                                             const SizedBox(width: 4),
                                           ],
                                           Text(
@@ -678,7 +727,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                     report['content'] ?? '',
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 13.5, height: 1.4),
+                                    style: const TextStyle(fontSize: 13.5, height: 1.4, color: AppTheme.textPrimary),
                                   ),
                                   if ((report['ai_tags'] as List?)?.isNotEmpty ?? false) ...[
                                     const SizedBox(height: 10),
@@ -686,23 +735,24 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                       spacing: 6,
                                       runSpacing: 4,
                                       children: (report['ai_tags'] as List).take(4).map((tag) => Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFE1FBF2),
+                                          color: const Color(0xFFEFF6FF),
                                           borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: const Color(0xFFBFDBFE)),
                                         ),
                                         child: Text(
                                           '#$tag',
                                           style: const TextStyle(
-                                            color: Color(0xFF047857),
+                                            color: AppTheme.primaryBlue,
                                             fontSize: 11,
-                                            fontWeight: FontWeight.w500,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       )).toList(),
                                     ),
                                   ],
-                                  const Divider(height: 22),
+                                  const Divider(height: 22, color: AppTheme.cardBorder),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -738,20 +788,21 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                       else
                                         OutlinedButton.icon(
                                           onPressed: () => _showAppreciationDialog(report['id'], studentName),
-                                          icon: const Icon(Icons.favorite_border, color: Colors.pink, size: 15),
-                                          label: const Text('Beri Apresiasi', style: TextStyle(color: Colors.pink, fontSize: 12)),
+                                          icon: const Icon(Icons.favorite_border, color: AppTheme.secondaryTangerine, size: 15),
+                                          label: const Text('Beri Apresiasi', style: TextStyle(color: AppTheme.secondaryTangerine, fontSize: 12, fontWeight: FontWeight.bold)),
                                           style: OutlinedButton.styleFrom(
                                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                            side: const BorderSide(color: Colors.pink),
+                                            side: const BorderSide(color: AppTheme.secondaryTangerine),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                           ),
                                         ),
                                       const SizedBox(width: 8),
                                       TextButton.icon(
                                         onPressed: () => _navigateToReportDetail(report['id']),
-                                        icon: const Icon(Icons.arrow_forward, size: 14, color: AppTheme.primaryGreen),
+                                        icon: const Icon(Icons.arrow_forward, size: 14, color: AppTheme.primaryBlue),
                                         label: const Text(
                                           'Detail & AI',
-                                          style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 12.5),
+                                          style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 12.5),
                                         ),
                                       ),
                                     ],

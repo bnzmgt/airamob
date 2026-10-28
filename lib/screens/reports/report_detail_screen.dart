@@ -184,10 +184,10 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFFE1FBF2) : Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(16),
+                            color: isSelected ? const Color(0xFFEFF6FF) : const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: isSelected ? AppTheme.primaryGreen : Colors.grey.shade200,
+                              color: isSelected ? AppTheme.primaryBlue : AppTheme.cardBorder,
                               width: isSelected ? 2 : 1,
                             ),
                           ),
@@ -200,7 +200,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                  color: isSelected ? AppTheme.primaryGreen : AppTheme.textDark,
+                                  color: isSelected ? AppTheme.primaryBlue : AppTheme.textPrimary,
                                 ),
                               ),
                             ],
@@ -216,11 +216,11 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                     controller: _appreciationMsgController,
                     maxLength: 250,
                     maxLines: 3,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Tuliskan pesan apresiasi singkat (opsional)...',
                       helperText: 'Pesan akan muncul di notifikasi dan portal siswa',
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: Color(0xFFF8FAFC),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -251,7 +251,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                               messenger.showSnackBar(
                                 const SnackBar(
                                   content: Text('Apresiasi berhasil dikirim! Notifikasi diteruskan ke anak.'),
-                                  backgroundColor: AppTheme.primaryGreen,
+                                  backgroundColor: AppTheme.primaryBlue,
                                 ),
                               );
                               _loadReport();
@@ -259,11 +259,15 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                               messenger.showSnackBar(
                                 SnackBar(
                                   content: Text(res.message ?? 'Gagal mengirim apresiasi.'),
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: AppTheme.destructive,
                                 ),
                               );
                             }
                           },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryBlue,
+                      minimumSize: const Size(double.infinity, 48),
+                    ),
                     child: _isSendingAppreciation
                         ? const SizedBox(
                             width: 20,
@@ -284,11 +288,11 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
   Color _getSentimentColor(String? sentiment) {
     switch (sentiment) {
       case 'positive':
-        return const Color(0xFF047857);
+        return const Color(0xFF10B981);
       case 'neutral':
-        return Colors.blue.shade700;
+        return AppTheme.primaryBlue;
       case 'negative':
-        return Colors.amber.shade900;
+        return AppTheme.secondaryTangerine;
       default:
         return AppTheme.textMuted;
     }
@@ -297,13 +301,13 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
   String _getSentimentLabel(String? sentiment) {
     switch (sentiment) {
       case 'positive':
-        return '🟢 Kondisi Positif';
+        return '● Kondisi Positif';
       case 'neutral':
-        return '🔵 Kondisi Stabil';
+        return '● Kondisi Stabil';
       case 'negative':
-        return '🟠 Perlu Perhatian';
+        return '● Perlu Perhatian';
       default:
-        return '⚪ Evaluasi Rutin';
+        return '● Evaluasi Rutin';
     }
   }
 
@@ -336,7 +340,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen))
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
           : _errorMessage != null
               ? Center(
                   child: Padding(
@@ -344,16 +348,17 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                        const Icon(Icons.error_outline, size: 48, color: AppTheme.destructive),
                         const SizedBox(height: 12),
                         Text(
                           _errorMessage!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: AppTheme.textDark, fontSize: 16),
+                          style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: _loadReport,
+                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
                           child: const Text('Coba Lagi'),
                         ),
                       ],
@@ -364,24 +369,22 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
       bottomNavigationBar: widget.isParent && _report != null
           ? Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    offset: const Offset(0, -2),
-                    blurRadius: 10,
-                  ),
-                ],
+                border: Border(top: BorderSide(color: AppTheme.cardBorder)),
               ),
               child: ElevatedButton.icon(
                 onPressed: _showAppreciationBottomSheet,
-                icon: const Icon(Icons.favorite_outline),
+                icon: const Icon(Icons.favorite_outline, color: Colors.white),
                 label: Text(
                   _report!['my_appreciation'] != null ? 'Ubah Apresiasi' : 'Beri Apresiasi ke Anak',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _report!['my_appreciation'] != null ? Colors.pink.shade700 : AppTheme.primaryGreen,
+                  backgroundColor: AppTheme.secondaryTangerine,
+                  minimumSize: const Size(double.infinity, 50),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             )
@@ -399,7 +402,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
 
     return RefreshIndicator(
       onRefresh: _loadReport,
-      color: AppTheme.primaryGreen,
+      color: AppTheme.primaryBlue,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
@@ -408,6 +411,11 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
           children: [
             // Student & Date Header
             Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: const BorderSide(color: AppTheme.cardBorder),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -417,9 +425,9 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const CircleAvatar(
-                          backgroundColor: Color(0xFFE1FBF2),
+                          backgroundColor: Color(0xFFEFF6FF),
                           radius: 24,
-                          child: Icon(Icons.school, color: AppTheme.primaryGreen),
+                          child: Icon(Icons.school_outlined, color: AppTheme.primaryBlue),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -430,7 +438,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                                 studentData != null
                                     ? (studentData['name'] ?? 'Siswa')
                                     : 'Laporan Mandiri',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textDark),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -445,7 +453,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    const Divider(height: 1),
+                    const Divider(height: 1, color: AppTheme.cardBorder),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -453,8 +461,9 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: _getSentimentColor(_report!['sentiment_level']).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: AppTheme.cardBorder),
                           ),
                           child: Text(
                             _getSentimentLabel(_report!['sentiment_level']),
@@ -481,6 +490,11 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
             // AI Auto-Tags Chips
             if (aiTags.isNotEmpty) ...[
               Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: const BorderSide(color: AppTheme.cardBorder),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -488,11 +502,11 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.auto_awesome, size: 18, color: AppTheme.primaryGreen),
+                          Icon(Icons.auto_awesome, size: 18, color: AppTheme.primaryBlue),
                           SizedBox(width: 8),
                           Text(
                             'Topik / Tag Belajar Terdeteksi (AI):',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textPrimary),
                           ),
                         ],
                       ),
@@ -504,16 +518,16 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE1FBF2),
+                              color: const Color(0xFFEFF6FF),
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFFA7F3D0)),
+                              border: Border.all(color: const Color(0xFFBFDBFE)),
                             ),
                             child: Text(
                               '#$tag',
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF047857),
+                                color: AppTheme.primaryBlue,
                               ),
                             ),
                           );
@@ -528,6 +542,11 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
 
             // Content / Reflection Card
             Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: const BorderSide(color: AppTheme.cardBorder),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -535,18 +554,18 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.menu_book, size: 18, color: AppTheme.primaryGreen),
+                        Icon(Icons.menu_book_outlined, size: 18, color: AppTheme.primaryBlue),
                         SizedBox(width: 8),
                         Text(
                           'Materi & Catatan Belajar:',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textDark),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
                         ),
                       ],
                     ),
                     const SizedBox(height: 10),
                     Text(
                       _report!['content'] ?? '-',
-                      style: const TextStyle(fontSize: 15, height: 1.5, color: AppTheme.textDark),
+                      style: const TextStyle(fontSize: 14.5, height: 1.5, color: AppTheme.textPrimary),
                     ),
                   ],
                 ),
@@ -557,10 +576,11 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
             // Happy Moment Card
             if (_report!['happy_moment'] != null && (_report!['happy_moment'] as String).isNotEmpty) ...[
               Card(
-                color: const Color(0xFFECFDF5),
+                elevation: 0,
+                color: const Color(0xFFF0FDF4),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: Color(0xFFA7F3D0)),
+                  borderRadius: BorderRadius.circular(14),
+                  side: const BorderSide(color: Color(0xFFBBF7D0)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -573,14 +593,14 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                           SizedBox(width: 8),
                           Text(
                             'Hal yang Membuat Senang:',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF065F46)),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF166534)),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
                       Text(
                         _report!['happy_moment'],
-                        style: const TextStyle(fontSize: 14, color: Color(0xFF064E3B), height: 1.4),
+                        style: const TextStyle(fontSize: 14, color: Color(0xFF166534), height: 1.4),
                       ),
                     ],
                   ),
@@ -592,30 +612,31 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
             // Frustrated Moment Card
             if (_report!['frustrated_moment'] != null && (_report!['frustrated_moment'] as String).isNotEmpty) ...[
               Card(
-                color: Colors.amber.shade50,
+                elevation: 0,
+                color: AppTheme.amberSurface,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: Colors.amber.shade200),
+                  borderRadius: BorderRadius.circular(14),
+                  side: const BorderSide(color: Color(0xFFFDE68A)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
-                          const Text('😤', style: TextStyle(fontSize: 18)),
-                          const SizedBox(width: 8),
+                          Text('😤', style: TextStyle(fontSize: 18)),
+                          SizedBox(width: 8),
                           Text(
                             'Kendala Belajar / Hal yang Mengganjal:',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.amber.shade900),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.amberText),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
                       Text(
                         _report!['frustrated_moment'],
-                        style: TextStyle(fontSize: 14, color: Colors.amber.shade900, height: 1.4),
+                        style: const TextStyle(fontSize: 14, color: AppTheme.amberText, height: 1.4),
                       ),
                     ],
                   ),
@@ -627,6 +648,11 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
             // Photo Evidence Card with Zoom Lightbox
             if (ApiEndpoints.resolveImageUrl(_report!['photo_url'] as String?).isNotEmpty) ...[
               Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: const BorderSide(color: AppTheme.cardBorder),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -634,9 +660,9 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.photo_library_outlined, size: 18, color: AppTheme.primaryGreen),
+                          Icon(Icons.photo_library_outlined, size: 18, color: AppTheme.primaryBlue),
                           SizedBox(width: 8),
-                          Text('Dokumentasi Foto Belajar:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          Text('Dokumentasi Foto Belajar:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary)),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -656,16 +682,16 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                                   if (progress == null) return child;
                                   return Container(
                                     height: 220,
-                                    color: Colors.grey.shade100,
+                                    color: const Color(0xFFF1F5F9),
                                     child: const Center(
-                                      child: CircularProgressIndicator(color: AppTheme.primaryGreen),
+                                      child: CircularProgressIndicator(color: AppTheme.primaryBlue),
                                     ),
                                   );
                                 },
                                 errorBuilder: (context, error, stackTrace) {
                                   return Container(
                                     height: 120,
-                                    color: Colors.grey.shade100,
+                                    color: const Color(0xFFF1F5F9),
                                     child: const Center(
                                       child: Text('Foto tidak dapat dimuat.', style: TextStyle(color: AppTheme.textMuted)),
                                     ),
@@ -704,40 +730,43 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
 
             // AI Parent Guidance Card
             if (parentGuidance != null && parentGuidance.toString().isNotEmpty) ...[
-              Card(
-                color: const Color(0xFFF0FDF4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: Color(0xFF86EFAC)),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: const Border(
+                    left: BorderSide(color: AppTheme.primaryBlue, width: 3),
+                    top: BorderSide(color: AppTheme.cardBorder, width: 1),
+                    right: BorderSide(color: AppTheme.cardBorder, width: 1),
+                    bottom: BorderSide(color: AppTheme.cardBorder, width: 1),
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Row(
-                        children: [
-                          Icon(Icons.psychology, color: Color(0xFF15803D), size: 22),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              '💡 Panduan Apresiasi Orang Tua (AI)',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: Color(0xFF166534),
-                              ),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.psychology_outlined, color: AppTheme.primaryBlue, size: 22),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '💡 Panduan Apresiasi Orang Tua (AI)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: AppTheme.primaryBlue,
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        parentGuidance.toString(),
-                        style: const TextStyle(fontSize: 13.5, height: 1.5, color: Color(0xFF14532D)),
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      parentGuidance.toString(),
+                      style: const TextStyle(fontSize: 13.5, height: 1.5, color: AppTheme.textPrimary),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
@@ -746,9 +775,10 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
             // Appreciations Section
             if (appreciations.isNotEmpty) ...[
               Card(
+                elevation: 0,
                 color: const Color(0xFFFFF1F2),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(14),
                   side: const BorderSide(color: Color(0xFFFECDD3)),
                 ),
                 child: Padding(
@@ -774,7 +804,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: const Color(0xFFFFE4E6)),
                             ),
                             child: Row(
@@ -787,13 +817,13 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                                     children: [
                                       Text(
                                         '${appr['label'] ?? 'Apresiasi'} dari ${appr['parent_name'] ?? 'Orang Tua'}',
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textPrimary),
                                       ),
                                       if (appr['message'] != null && appr['message'].toString().isNotEmpty) ...[
                                         const SizedBox(height: 2),
                                         Text(
                                           '"${appr['message']}"',
-                                          style: const TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: AppTheme.textDark),
+                                          style: const TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: AppTheme.textPrimary),
                                         ),
                                       ],
                                     ],

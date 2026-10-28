@@ -163,15 +163,15 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('File $ext.toUpperCase() berhasil diunduh: $filename'),
-            backgroundColor: AppTheme.primaryGreen,
+            content: Text('File ${ext.toUpperCase()} berhasil diunduh: $filename'),
+            backgroundColor: AppTheme.primaryBlue,
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Gagal mengunduh berkas (Status: ${res.statusCode})'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.destructive,
           ),
         );
       }
@@ -180,7 +180,7 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Terjadi kesalahan saat unduh: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.destructive,
           ),
         );
       }
@@ -206,8 +206,11 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text('Apresiasi Belajar $studentName', style: const TextStyle(fontSize: 16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: AppTheme.cardBorder),
+          ),
+          title: Text('Apresiasi Belajar $studentName', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -223,9 +226,9 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppTheme.accentGreen : Colors.transparent,
+                        color: isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
                         border: Border.all(
-                          color: isSelected ? AppTheme.primaryGreen : Colors.grey.shade300,
+                          color: isSelected ? AppTheme.primaryBlue : AppTheme.cardBorder,
                           width: isSelected ? 2 : 1,
                         ),
                         borderRadius: BorderRadius.circular(12),
@@ -234,7 +237,7 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                         children: [
                           Text(r['emoji']!, style: const TextStyle(fontSize: 22)),
                           const SizedBox(height: 2),
-                          Text(r['label']!, style: const TextStyle(fontSize: 10)),
+                          Text(r['label']!, style: TextStyle(fontSize: 10, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? AppTheme.primaryBlue : AppTheme.textPrimary)),
                         ],
                       ),
                     ),
@@ -275,7 +278,7 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Apresiasi berhasil dikirim ke ananda!'),
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.primaryBlue,
                     ),
                   );
                   _loadReports(page: _currentPage);
@@ -283,11 +286,12 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(res.message ?? 'Gagal mengirim apresiasi'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppTheme.destructive,
                     ),
                   );
                 }
               },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
               child: const Text('Kirim'),
             ),
           ],
@@ -325,10 +329,10 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
         ],
       ),
       body: _isLoading && _student == null
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen))
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
           : RefreshIndicator(
               onRefresh: () => _loadReports(page: 1),
-              color: AppTheme.primaryGreen,
+              color: AppTheme.primaryBlue,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
@@ -337,21 +341,24 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                   children: [
                     // Student Banner Card
                     Card(
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Row(
                           children: [
                             CircleAvatar(
                               radius: 26,
-                              backgroundColor: AppTheme.primaryGreen.withOpacity(0.12),
+                              backgroundColor: const Color(0xFFEFF6FF),
                               child: Text(
                                 studentName.isNotEmpty ? studentName.substring(0, studentName.length >= 2 ? 2 : 1).toUpperCase() : 'A',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: AppTheme.primaryGreen,
+                                  color: AppTheme.primaryBlue,
                                 ),
                               ),
                             ),
@@ -362,7 +369,7 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                                 children: [
                                   Text(
                                     studentName,
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
@@ -375,17 +382,17 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
-                                color: AppTheme.accentGreen,
+                                color: const Color(0xFFF1F5F9),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.2)),
+                                border: Border.all(color: AppTheme.cardBorder),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  const Text('Total Terarsip', style: TextStyle(fontSize: 10, color: AppTheme.primaryGreen)),
+                                  const Text('Total Terarsip', style: TextStyle(fontSize: 10, color: AppTheme.textMuted)),
                                   Text(
                                     '${_student?['total_reports'] ?? _totalReports} Laporan',
-                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.primaryGreen),
+                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
                                   ),
                                 ],
                               ),
@@ -398,30 +405,34 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
 
                     // Filter & Export Card
                     Card(
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(14),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Text('Filter Rentang Tanggal & Ekspor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                            const Text('Filter Rentang Tanggal & Ekspor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textPrimary)),
                             const SizedBox(height: 10),
                             Row(
                               children: [
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: _pickFromDate,
-                                    icon: const Icon(Icons.calendar_today, size: 14),
+                                    icon: const Icon(Icons.calendar_today, size: 14, color: AppTheme.primaryBlue),
                                     label: Text(
                                       _fromDate != null ? _formatDate(_fromDate!) : 'Dari Tanggal',
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: _fromDate != null ? Colors.black87 : AppTheme.textMuted,
+                                        color: _fromDate != null ? AppTheme.textPrimary : AppTheme.textMuted,
                                       ),
                                     ),
                                     style: OutlinedButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                      side: const BorderSide(color: AppTheme.cardBorder),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                   ),
@@ -430,16 +441,17 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: _pickToDate,
-                                    icon: const Icon(Icons.event, size: 14),
+                                    icon: const Icon(Icons.event, size: 14, color: AppTheme.primaryBlue),
                                     label: Text(
                                       _toDate != null ? _formatDate(_toDate!) : 'Sampai Tanggal',
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: _toDate != null ? Colors.black87 : AppTheme.textMuted,
+                                        color: _toDate != null ? AppTheme.textPrimary : AppTheme.textMuted,
                                       ),
                                     ),
                                     style: OutlinedButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                      side: const BorderSide(color: AppTheme.cardBorder),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                   ),
@@ -452,19 +464,19 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                                 alignment: Alignment.centerRight,
                                 child: TextButton.icon(
                                   onPressed: _resetFilters,
-                                  icon: const Icon(Icons.clear, size: 14, color: Colors.grey),
-                                  label: const Text('Reset Filter', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  icon: const Icon(Icons.clear, size: 14, color: AppTheme.textMuted),
+                                  label: const Text('Reset Filter', style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
                                 ),
                               ),
                             ],
-                            const Divider(height: 20),
+                            const Divider(height: 20, color: AppTheme.cardBorder),
                             Row(
                               children: [
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: _isExporting ? null : () => _exportData(true),
-                                    icon: const Icon(Icons.picture_as_pdf, size: 16, color: Colors.red),
-                                    label: const Text('Cetak PDF', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    icon: const Icon(Icons.picture_as_pdf_outlined, size: 16, color: Color(0xFFEF4444)),
+                                    label: const Text('Cetak PDF', style: TextStyle(color: Color(0xFFEF4444), fontSize: 12, fontWeight: FontWeight.bold)),
                                     style: OutlinedButton.styleFrom(
                                       side: const BorderSide(color: Color(0xFFFECDD3)),
                                       backgroundColor: const Color(0xFFFFF1F2),
@@ -477,11 +489,11 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: _isExporting ? null : () => _exportData(false),
-                                    icon: const Icon(Icons.table_chart, size: 16, color: AppTheme.primaryGreen),
-                                    label: const Text('Export CSV', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    icon: const Icon(Icons.table_chart_outlined, size: 16, color: AppTheme.primaryBlue),
+                                    label: const Text('Export CSV', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 12, fontWeight: FontWeight.bold)),
                                     style: OutlinedButton.styleFrom(
-                                      side: BorderSide(color: AppTheme.primaryGreen.withOpacity(0.3)),
-                                      backgroundColor: AppTheme.accentGreen,
+                                      side: const BorderSide(color: Color(0xFFBFDBFE)),
+                                      backgroundColor: const Color(0xFFEFF6FF),
                                       padding: const EdgeInsets.symmetric(vertical: 10),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
@@ -501,13 +513,13 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                       children: [
                         Text(
                           'Daftar Laporan ($_totalReports)',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary),
                         ),
                         if (_isLoading)
                           const SizedBox(
                             width: 14,
                             height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryGreen),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue),
                           ),
                       ],
                     ),
@@ -517,20 +529,20 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                     if (_reports.isEmpty && !_isLoading)
                       Card(
                         elevation: 0,
-                        color: Colors.grey.shade50,
+                        color: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
-                          side: BorderSide(color: Colors.grey.shade200),
+                          side: const BorderSide(color: AppTheme.cardBorder),
                         ),
                         child: const Padding(
                           padding: EdgeInsets.symmetric(vertical: 36, horizontal: 20),
                           child: Column(
                             children: [
-                              Icon(Icons.description_outlined, size: 48, color: Colors.grey),
+                              Icon(Icons.description_outlined, size: 48, color: AppTheme.textMuted),
                               SizedBox(height: 10),
                               Text(
                                 'Tidak ada laporan yang ditemukan',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.grey),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
                               ),
                               SizedBox(height: 4),
                               Text(
@@ -548,8 +560,12 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                         final hasPhoto = report['photo_url'] != null;
 
                         return Card(
+                          elevation: 0,
                           margin: const EdgeInsets.only(bottom: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            side: const BorderSide(color: AppTheme.cardBorder),
+                          ),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(14),
                             onTap: () => _navigateToReportDetail(report['id']),
@@ -563,21 +579,22 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                                     children: [
                                       Text(
                                         _formatReadableDate(report['report_date']),
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
                                       ),
                                       if (hasPhoto)
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                           decoration: BoxDecoration(
-                                            color: AppTheme.accentGreen,
+                                            color: const Color(0xFFF1F5F9),
                                             borderRadius: BorderRadius.circular(6),
+                                            border: Border.all(color: AppTheme.cardBorder),
                                           ),
                                           child: const Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Icon(Icons.photo_camera, size: 12, color: AppTheme.primaryGreen),
+                                              Icon(Icons.photo_camera_outlined, size: 12, color: AppTheme.primaryBlue),
                                               SizedBox(width: 4),
-                                              Text('Foto', style: TextStyle(fontSize: 10, color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
+                                              Text('Foto', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
                                             ],
                                           ),
                                         ),
@@ -588,7 +605,7 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                                     report['content'] ?? '',
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 13.5, height: 1.4),
+                                    style: const TextStyle(fontSize: 13.5, height: 1.4, color: AppTheme.textPrimary),
                                   ),
                                   if ((report['ai_tags'] as List?)?.isNotEmpty ?? false) ...[
                                     const SizedBox(height: 10),
@@ -596,23 +613,24 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                                       spacing: 6,
                                       runSpacing: 4,
                                       children: (report['ai_tags'] as List).take(4).map((tag) => Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFE1FBF2),
+                                          color: const Color(0xFFEFF6FF),
                                           borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: const Color(0xFFBFDBFE)),
                                         ),
                                         child: Text(
                                           '#$tag',
                                           style: const TextStyle(
-                                            color: Color(0xFF047857),
+                                            color: AppTheme.primaryBlue,
                                             fontSize: 11,
-                                            fontWeight: FontWeight.w500,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       )).toList(),
                                     ),
                                   ],
-                                  const Divider(height: 22),
+                                  const Divider(height: 22, color: AppTheme.cardBorder),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -648,20 +666,21 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                                       else
                                         OutlinedButton.icon(
                                           onPressed: () => _showAppreciationDialog(report['id'], studentName),
-                                          icon: const Icon(Icons.favorite_border, color: Colors.pink, size: 15),
-                                          label: const Text('Beri Apresiasi', style: TextStyle(color: Colors.pink, fontSize: 12)),
+                                          icon: const Icon(Icons.favorite_border, color: AppTheme.secondaryTangerine, size: 15),
+                                          label: const Text('Beri Apresiasi', style: TextStyle(color: AppTheme.secondaryTangerine, fontSize: 12, fontWeight: FontWeight.bold)),
                                           style: OutlinedButton.styleFrom(
                                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                            side: const BorderSide(color: Colors.pink),
+                                            side: const BorderSide(color: AppTheme.secondaryTangerine),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                           ),
                                         ),
                                       const SizedBox(width: 8),
                                       TextButton.icon(
                                         onPressed: () => _navigateToReportDetail(report['id']),
-                                        icon: const Icon(Icons.arrow_forward, size: 14, color: AppTheme.primaryGreen),
+                                        icon: const Icon(Icons.arrow_forward, size: 14, color: AppTheme.primaryBlue),
                                         label: const Text(
                                           'Detail & AI',
-                                          style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 12.5),
+                                          style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 12.5),
                                         ),
                                       ),
                                     ],
@@ -680,17 +699,17 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.chevron_left),
+                            icon: const Icon(Icons.chevron_left, color: AppTheme.primaryBlue),
                             onPressed: _currentPage > 1
                                 ? () => _loadReports(page: _currentPage - 1)
                                 : null,
                           ),
                           Text(
                             'Halaman $_currentPage dari $_lastPage',
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.chevron_right),
+                            icon: const Icon(Icons.chevron_right, color: AppTheme.primaryBlue),
                             onPressed: _currentPage < _lastPage
                                 ? () => _loadReports(page: _currentPage + 1)
                                 : null,

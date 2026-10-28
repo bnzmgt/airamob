@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: const Row(
                 children: [
-                  Icon(Icons.dns_outlined, color: AppTheme.primaryGreen),
+                  Icon(Icons.dns_outlined, color: AppTheme.primaryBlue),
                   SizedBox(width: 8),
                   Text('Pengaturan Server', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Server berhasil diatur ke: $newUrl'),
-                          backgroundColor: AppTheme.primaryGreen,
+                          backgroundColor: AppTheme.primaryBlue,
                         ),
                       );
                     }
@@ -276,15 +276,24 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header Logo / Icon
+                // Header Logo
                 Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppTheme.accentGreen,
-                      borderRadius: BorderRadius.circular(24),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      height: 76,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: AppTheme.borderDefault),
+                        ),
+                        child: const Icon(Icons.school, size: 50, color: AppTheme.primaryBlue),
+                      ),
                     ),
-                    child: const Icon(Icons.school, size: 54, color: AppTheme.primaryGreen),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -294,7 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.primaryGreen,
+                    color: AppTheme.textPrimary,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -302,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text(
                   'Daily Study Report & Family Connection',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                  style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 32),
 
@@ -361,10 +370,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       MaterialPageRoute(builder: (_) => const TrackIncidentScreen()),
                     );
                   },
-                  icon: const Icon(Icons.shield_outlined, color: AppTheme.primaryGreen),
+                  icon: const Icon(Icons.shield_outlined, color: AppTheme.primaryBlue),
                   label: const Text(
                     'Lacak Tiket Aduan LANTANG (Tanpa Login)',
-                    style: TextStyle(color: AppTheme.primaryGreen),
+                    style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.w600),
                   ),
                 ),
                 const SizedBox(height: 20),

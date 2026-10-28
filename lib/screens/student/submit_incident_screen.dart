@@ -58,8 +58,8 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppTheme.primaryGreen),
-              title: const Text('Ambil dari Kamera'),
+              leading: const Icon(Icons.camera_alt_outlined, color: AppTheme.primaryBlue),
+              title: const Text('Ambil dari Kamera', style: TextStyle(fontWeight: FontWeight.w600)),
               onTap: () async {
                 Navigator.pop(ctx);
                 final picked = await _picker.pickImage(
@@ -74,8 +74,8 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppTheme.primaryGreen),
-              title: const Text('Pilih dari Galeri'),
+              leading: const Icon(Icons.photo_library_outlined, color: AppTheme.primaryBlue),
+              title: const Text('Pilih dari Galeri', style: TextStyle(fontWeight: FontWeight.w600)),
               onTap: () async {
                 Navigator.pop(ctx);
                 final picked = await _picker.pickImage(
@@ -154,33 +154,40 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppTheme.borderDefault),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircleAvatar(
-              radius: 30,
-              backgroundColor: AppTheme.accentGreen,
-              child: Icon(Icons.check, color: AppTheme.primaryGreen, size: 36),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceTint,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppTheme.borderDefault),
+              ),
+              child: const Icon(Icons.check, color: AppTheme.primaryBlue, size: 36),
             ),
             const SizedBox(height: 16),
             const Text(
               'Laporan LANTANG Terkirim',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textPrimary),
             ),
             const SizedBox(height: 8),
             const Text(
               'Terima kasih atas keberanianmu melapor. Tim Guru BK / TPPK akan menindaklanjuti laporanmu secara bijaksana.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13, height: 1.4),
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppTheme.surfaceTint,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(color: AppTheme.borderDefault),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,12 +195,24 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('KODE TIKET RAHASIA', style: TextStyle(fontSize: 10, color: AppTheme.textMuted, fontWeight: FontWeight.bold)),
-                      Text(ticketCode, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryGreen)),
+                      const Text(
+                        'KODE TIKET RAHASIA',
+                        style: TextStyle(fontSize: 10, color: AppTheme.textMuted, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        ticketCode,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryBlue,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
                     ],
                   ),
                   IconButton(
-                    icon: const Icon(Icons.copy, color: AppTheme.primaryGreen),
+                    icon: const Icon(Icons.copy, color: AppTheme.primaryBlue),
                     tooltip: 'Salin Kode Tiket',
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: ticketCode));
@@ -224,6 +243,7 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                 MaterialPageRoute(builder: (_) => const TrackIncidentScreen()),
               );
             },
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
             child: const Text('Lacak Kasus'),
           ),
         ],
@@ -243,63 +263,75 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Mode Kerahasiaan Card
-            Card(
-              color: _isAnonymous ? Colors.amber.shade50 : AppTheme.accentGreen,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _isAnonymous ? 'Mode: Anonim Total' : 'Mode: Kerahasiaan Terjaga',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: _isAnonymous ? Colors.amber.shade900 : AppTheme.primaryGreen,
-                          ),
-                        ),
-                        Switch(
-                          value: _isAnonymous,
-                          activeColor: Colors.amber.shade800,
-                          onChanged: (val) => setState(() => _isAnonymous = val),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _isAnonymous
-                          ? 'Akun Anda tidak dicatat sama sekali di database. Anda hanya dapat melacak laporan ini menggunakan kode tiket rahasia.'
-                          : 'Identitas Anda terlindungi dan hanya dapat dilihat oleh Tim Guru BK / TPPK saat mediasi.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _isAnonymous ? Colors.amber.shade900 : AppTheme.primaryGreen,
-                      ),
-                    ),
-                  ],
+            Container(
+              decoration: BoxDecoration(
+                color: _isAnonymous ? AppTheme.amberSurface : Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: _isAnonymous ? AppTheme.secondaryTangerine : AppTheme.primaryBlue,
+                  width: 1.5,
                 ),
               ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _isAnonymous ? 'Mode: Anonim Total' : 'Mode: Kerahasiaan Terjaga',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: _isAnonymous ? AppTheme.amberText : AppTheme.primaryBlue,
+                        ),
+                      ),
+                      Switch(
+                        value: _isAnonymous,
+                        activeColor: AppTheme.secondaryTangerine,
+                        onChanged: (val) => setState(() => _isAnonymous = val),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _isAnonymous
+                        ? 'Akun Anda tidak dicatat sama sekali di database. Anda hanya dapat melacak laporan ini menggunakan kode tiket rahasia.'
+                        : 'Identitas Anda terlindungi dan hanya dapat dilihat oleh Tim Guru BK / TPPK saat mediasi.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.4,
+                      color: _isAnonymous ? AppTheme.amberText : AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Peran Pelapor
-            const Text('Posisi Anda dalam Insiden *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Text(
+              'Posisi Anda dalam Insiden *',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
                   child: RadioListTile<String>(
-                    title: const Text('Saya Korban', style: TextStyle(fontSize: 13)),
+                    title: const Text('Saya Korban', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                     value: 'self',
+                    activeColor: AppTheme.primaryBlue,
                     groupValue: _victimType,
                     onChanged: (val) => setState(() => _victimType = val!),
                   ),
                 ),
                 Expanded(
                   child: RadioListTile<String>(
-                    title: const Text('Saya Saksi', style: TextStyle(fontSize: 13)),
+                    title: const Text('Saya Saksi', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                     value: 'other',
+                    activeColor: AppTheme.primaryBlue,
                     groupValue: _victimType,
                     onChanged: (val) => setState(() => _victimType = val!),
                   ),
@@ -319,7 +351,10 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
             const SizedBox(height: 16),
 
             // Kategori
-            const Text('Kategori Insiden *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Text(
+              'Kategori Insiden *',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+            ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               value: _category,
@@ -335,7 +370,10 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
             const SizedBox(height: 16),
 
             // Lokasi
-            const Text('Lokasi Kejadian *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Text(
+              'Lokasi Kejadian *',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+            ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               value: _location,
@@ -346,13 +384,19 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
             const SizedBox(height: 16),
 
             // Tanggal Kejadian
-            const Text('Tanggal Kejadian *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Text(
+              'Tanggal Kejadian *',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+            ),
             const SizedBox(height: 8),
             ListTile(
               tileColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey.shade300)),
-              leading: const Icon(Icons.calendar_today, color: AppTheme.primaryGreen),
-              title: Text(_incidentDate.toIso8601String().split('T')[0]),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: AppTheme.borderDefault),
+              ),
+              leading: const Icon(Icons.calendar_today_outlined, color: AppTheme.primaryBlue),
+              title: Text(_incidentDate.toIso8601String().split('T')[0], style: const TextStyle(fontWeight: FontWeight.w500)),
               trailing: const Icon(Icons.arrow_drop_down),
               onTap: () async {
                 final picked = await showDatePicker(
@@ -369,9 +413,9 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
             // Terduga Pelaku
             CheckboxListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Mengetahui Identitas / Ciri Pelaku?', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              title: const Text('Mengetahui Identitas / Ciri Pelaku?', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
               value: _perpetratorKnown,
-              activeColor: AppTheme.primaryGreen,
+              activeColor: AppTheme.primaryBlue,
               onChanged: (val) => setState(() => _perpetratorKnown = val ?? false),
             ),
             if (_perpetratorKnown) ...[
@@ -388,7 +432,10 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
             const SizedBox(height: 16),
 
             // Kronologi
-            const Text('Ceritakan Kronologi Kejadian *', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Text(
+              'Ceritakan Kronologi Kejadian *',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
@@ -397,10 +444,13 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                 hintText: 'Jelaskan apa yang terjadi, siapa saja yang ada di lokasi, dan bagaimana situasinya...',
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Lampiran Foto Bukti
-            const Text('Foto Dokumentasi / Bukti (Opsional)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Text(
+              'Foto Dokumentasi / Bukti (Opsional)',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+            ),
             const SizedBox(height: 8),
             if (_selectedPhoto != null)
               Container(
@@ -408,35 +458,62 @@ class _SubmitIncidentScreenState extends State<SubmitIncidentScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: AppTheme.borderDefault),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.image, color: AppTheme.primaryGreen, size: 30),
+                    const Icon(Icons.image, color: AppTheme.primaryBlue, size: 28),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(_selectedPhoto!.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      child: Text(
+                        _selectedPhoto!.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.red),
+                      icon: const Icon(Icons.close, color: AppTheme.destructive),
                       onPressed: () => setState(() => _selectedPhoto = null),
                     ),
                   ],
                 ),
               )
             else
-              OutlinedButton.icon(
-                onPressed: _pickPhoto,
-                icon: const Icon(Icons.camera_alt_outlined),
-                label: const Text('Pilih Foto Bukti (Maks. 2MB)'),
+              InkWell(
+                onTap: _pickPhoto,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.5), width: 1.2),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.camera_alt_outlined, color: AppTheme.primaryBlue, size: 20),
+                      SizedBox(width: 10),
+                      Text(
+                        'Pilih Foto Bukti (Maks. 2MB)',
+                        style: TextStyle(
+                          color: AppTheme.primaryBlue,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             const SizedBox(height: 28),
 
             ElevatedButton(
               onPressed: _isLoading ? null : _submitIncident,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryGreen,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: AppTheme.primaryBlue,
+                minimumSize: const Size(double.infinity, 50),
               ),
               child: _isLoading
                   ? const SizedBox(

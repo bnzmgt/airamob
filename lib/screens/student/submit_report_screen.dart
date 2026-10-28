@@ -37,8 +37,8 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppTheme.primaryGreen),
-              title: const Text('Ambil dari Kamera'),
+              leading: const Icon(Icons.camera_alt_outlined, color: AppTheme.primaryBlue),
+              title: const Text('Ambil dari Kamera', style: TextStyle(fontWeight: FontWeight.w600)),
               onTap: () async {
                 Navigator.pop(ctx);
                 final picked = await _picker.pickImage(
@@ -53,8 +53,8 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppTheme.primaryGreen),
-              title: const Text('Pilih dari Galeri'),
+              leading: const Icon(Icons.photo_library_outlined, color: AppTheme.primaryBlue),
+              title: const Text('Pilih dari Galeri', style: TextStyle(fontWeight: FontWeight.w600)),
               onTap: () async {
                 Navigator.pop(ctx);
                 final picked = await _picker.pickImage(
@@ -78,7 +78,10 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
     final content = _contentController.text.trim();
     if (content.length < 5) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Isi laporan belajar minimal 5 karakter.')),
+        const SnackBar(
+          content: Text('Isi laporan belajar minimal 5 karakter.'),
+          backgroundColor: AppTheme.destructive,
+        ),
       );
       return;
     }
@@ -105,7 +108,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Alhamdulillah, laporan belajar hari ini berhasil dikirim!'),
-          backgroundColor: AppTheme.primaryGreen,
+          backgroundColor: AppTheme.primaryBlue,
         ),
       );
       Navigator.pop(context, true);
@@ -113,7 +116,7 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(response.message ?? 'Gagal mengirim laporan.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.destructive,
         ),
       );
     }
@@ -132,9 +135,9 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
           children: [
             const Text(
               'Catatan Materi Belajar *',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             TextField(
               controller: _contentController,
               maxLines: 4,
@@ -142,12 +145,12 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
                 hintText: 'Tuliskan topik, materi, atau tugas yang dipelajari hari ini...',
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
             const Text(
               'Hal yang Membuat Senang 😊 (Opsional)',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             TextField(
               controller: _happyController,
               maxLines: 2,
@@ -155,12 +158,30 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
                 hintText: 'Contoh: Berhasil paham rumus matematika, dipuji ustadz/guru...',
               ),
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Kendala / Hal yang Membuat Jengkel 😤 (Opsional)',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            const SizedBox(height: 18),
+            Row(
+              children: [
+                const Text(
+                  'Kendala / Hal yang Membuat Jengkel 😤',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+                ),
+                const SizedBox(width: 4),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: AppTheme.secondaryTangerine,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Text(
+                  '(Opsional)',
+                  style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                ),
+              ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             TextField(
               controller: _frustratedController,
               maxLines: 2,
@@ -168,10 +189,10 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
                 hintText: 'Contoh: Masih bingung di soal nomor 5, mengantuk di kelas...',
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
             const Text(
               'Foto Bukti Belajar / Catatan 📷 (Opsional)',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
             ),
             const SizedBox(height: 8),
             if (_selectedPhoto != null)
@@ -180,31 +201,61 @@ class _SubmitReportScreenState extends State<SubmitReportScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: AppTheme.borderDefault),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.image, color: AppTheme.primaryGreen, size: 28),
+                    const Icon(Icons.image, color: AppTheme.primaryBlue, size: 28),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(_selectedPhoto!.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      child: Text(
+                        _selectedPhoto!.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.red),
+                      icon: const Icon(Icons.close, color: AppTheme.destructive),
                       onPressed: () => setState(() => _selectedPhoto = null),
                     ),
                   ],
                 ),
               )
             else
-              OutlinedButton.icon(
-                onPressed: _pickPhoto,
-                icon: const Icon(Icons.add_a_photo_outlined),
-                label: const Text('Lampirkan Foto Catatan / Tugas'),
+              InkWell(
+                onTap: _pickPhoto,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.5), width: 1.2),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_a_photo_outlined, color: AppTheme.primaryBlue, size: 20),
+                      SizedBox(width: 10),
+                      Text(
+                        'Lampirkan Foto Catatan / Tugas',
+                        style: TextStyle(
+                          color: AppTheme.primaryBlue,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
             ElevatedButton(
               onPressed: _isLoading ? null : _submitReport,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+              ),
               child: _isLoading
                   ? const SizedBox(
                       width: 20,

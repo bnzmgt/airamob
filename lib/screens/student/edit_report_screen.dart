@@ -77,7 +77,7 @@ class _EditReportScreenState extends State<EditReportScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppTheme.primaryGreen),
+              leading: const Icon(Icons.camera_alt, color: AppTheme.primaryBlue),
               title: const Text('Ambil Foto dari Kamera'),
               onTap: () {
                 Navigator.pop(ctx);
@@ -85,7 +85,7 @@ class _EditReportScreenState extends State<EditReportScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppTheme.primaryGreen),
+              leading: const Icon(Icons.photo_library, color: AppTheme.primaryBlue),
               title: const Text('Pilih dari Galeri'),
               onTap: () {
                 Navigator.pop(ctx);
@@ -136,7 +136,7 @@ class _EditReportScreenState extends State<EditReportScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Laporan belajar berhasil diperbarui!'),
-          backgroundColor: AppTheme.primaryGreen,
+          backgroundColor: AppTheme.primaryBlue,
         ),
       );
       Navigator.pop(context, true);
@@ -167,29 +167,29 @@ class _EditReportScreenState extends State<EditReportScreen> {
           children: [
             // Date Banner
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3F4F6),
+                color: AppTheme.surfaceTint,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: AppTheme.borderDefault),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today, size: 16, color: AppTheme.textMuted),
+                  const Icon(Icons.calendar_today_outlined, size: 16, color: AppTheme.textMuted),
                   const SizedBox(width: 8),
                   Text(
                     'Tanggal Laporan: $reportDate',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textPrimary),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Content Field
             const Text(
               'Apa yang kamu pelajari hari ini? *',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -203,6 +203,7 @@ class _EditReportScreenState extends State<EditReportScreen> {
 
             // Photo Evidence Section
             Card(
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -210,11 +211,11 @@ class _EditReportScreenState extends State<EditReportScreen> {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.photo_camera, color: AppTheme.primaryGreen, size: 20),
+                        Icon(Icons.photo_camera_outlined, color: AppTheme.primaryBlue, size: 20),
                         SizedBox(width: 8),
                         Text(
                           'Foto Bukti Belajar (Opsional)',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
                         ),
                       ],
                     ),
@@ -222,16 +223,22 @@ class _EditReportScreenState extends State<EditReportScreen> {
 
                     // Existing photo preview
                     if (existingPhotoUrl.isNotEmpty && !_removeExistingPhoto && _selectedPhoto == null) ...[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          existingPhotoUrl,
-                          height: 180,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppTheme.borderDefault),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            existingPhotoUrl,
+                            height: 180,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -239,51 +246,63 @@ class _EditReportScreenState extends State<EditReportScreen> {
                               onPressed: _showImagePickerSheet,
                               icon: const Icon(Icons.refresh, size: 16),
                               label: const Text('Ganti Foto', style: TextStyle(fontSize: 13)),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppTheme.primaryBlue,
+                                side: const BorderSide(color: AppTheme.borderDefault),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: OutlinedButton.icon(
                               onPressed: () => setState(() => _removeExistingPhoto = true),
-                              icon: const Icon(Icons.delete_outline, size: 16, color: Colors.red),
-                              label: const Text('Hapus Foto', style: TextStyle(color: Colors.red, fontSize: 13)),
-                              style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.red)),
+                              icon: const Icon(Icons.delete_outline, size: 16, color: AppTheme.destructive),
+                              label: const Text('Hapus Foto', style: TextStyle(color: AppTheme.destructive, fontSize: 13)),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: AppTheme.destructive),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ] else if (_selectedPhoto != null) ...[
                       // New selected photo preview
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: kIsWeb
-                            ? Image.network(
-                                _selectedPhoto!.path,
-                                height: 180,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              )
-                            : Image.file(
-                                File(_selectedPhoto!.path),
-                                height: 180,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppTheme.borderDefault),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: kIsWeb
+                              ? Image.network(
+                                  _selectedPhoto!.path,
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  File(_selectedPhoto!.path),
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          const Icon(Icons.check_circle, color: AppTheme.primaryGreen, size: 16),
+                          const Icon(Icons.check_circle, color: AppTheme.success, size: 16),
                           const SizedBox(width: 6),
                           const Expanded(
                             child: Text(
                               'Foto baru siap diunggah',
-                              style: TextStyle(color: AppTheme.primaryGreen, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: AppTheme.success, fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ),
                           TextButton(
                             onPressed: () => setState(() => _selectedPhoto = null),
-                            child: const Text('Batal Ganti', style: TextStyle(color: Colors.red, fontSize: 12)),
+                            child: const Text('Batal Ganti', style: TextStyle(color: AppTheme.destructive, fontSize: 12)),
                           ),
                         ],
                       ),
@@ -296,13 +315,14 @@ class _EditReportScreenState extends State<EditReportScreen> {
                           decoration: BoxDecoration(
                             color: Colors.red.shade50,
                             borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.red.shade200),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.info_outline, size: 16, color: Colors.red),
+                              const Icon(Icons.info_outline, size: 16, color: AppTheme.destructive),
                               const SizedBox(width: 6),
                               const Expanded(
-                                child: Text('Foto lama akan dihapus saat disimpan.', style: TextStyle(color: Colors.red, fontSize: 12)),
+                                child: Text('Foto lama akan dihapus saat disimpan.', style: TextStyle(color: AppTheme.destructive, fontSize: 12)),
                               ),
                               TextButton(
                                 onPressed: () => setState(() => _removeExistingPhoto = false),
@@ -311,13 +331,31 @@ class _EditReportScreenState extends State<EditReportScreen> {
                             ],
                           ),
                         ),
-                      OutlinedButton.icon(
-                        onPressed: _showImagePickerSheet,
-                        icon: const Icon(Icons.add_a_photo, color: AppTheme.primaryGreen),
-                        label: const Text('Unggah Foto Bukti Belajar', style: TextStyle(color: AppTheme.primaryGreen)),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 48),
-                          side: const BorderSide(color: AppTheme.primaryGreen),
+                      InkWell(
+                        onTap: _showImagePickerSheet,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.5), width: 1.2),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_a_photo_outlined, color: AppTheme.primaryBlue, size: 20),
+                              SizedBox(width: 10),
+                              Text(
+                                'Unggah Foto Bukti Belajar',
+                                style: TextStyle(
+                                  color: AppTheme.primaryBlue,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -330,7 +368,7 @@ class _EditReportScreenState extends State<EditReportScreen> {
             // Emotional Reflection: Happy Moment
             const Text(
               '😊 Apa yang membuatmu senang hari ini?',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF065F46)),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -343,9 +381,27 @@ class _EditReportScreenState extends State<EditReportScreen> {
             const SizedBox(height: 20),
 
             // Emotional Reflection: Frustrated Moment
-            const Text(
-              '😤 Apa kendala atau hal yang membuat jengkel?',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF991B1B)),
+            Row(
+              children: [
+                const Text(
+                  '😤 Apa kendala atau hal yang membuat jengkel?',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+                ),
+                const SizedBox(width: 4),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: AppTheme.secondaryTangerine,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Text(
+                  '(Opsional)',
+                  style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             TextField(
@@ -360,6 +416,9 @@ class _EditReportScreenState extends State<EditReportScreen> {
             // Save Changes Button
             ElevatedButton(
               onPressed: _isLoading ? null : _updateReport,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+              ),
               child: _isLoading
                   ? const SizedBox(
                       width: 20,
