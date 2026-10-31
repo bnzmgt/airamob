@@ -39,6 +39,12 @@ Dokumen ini adalah panduan baku dan *ground truth rules* bagi AI Agent dan Devel
 - Kredensial sensitif, token otentikasi, dan sesi pengguna **WAJIB** disimpan menggunakan hardware-backed storage (`FlutterSecureStorage`).
 - URL dasar API (`API_BASE_URL`) harus tetap dinamis dan mendukung pengaturan konfigurasi server via modal/UI agar fleksibel saat berpindah antara lingkungan lokal, staging, dan VPS live (`https://ainara.dstr.biz.id/api/v1`).
 
+### 📡 Rule 7: Vibe Coder Backend Contract Parity Guardrail
+- Setiap kali menambahkan atau mengonsumsi endpoint API dari backend:
+  1. Periksa [docs/PARITY_MATRIX.md](file:///Users/maaswick/workspace/ainara_mobile/docs/PARITY_MATRIX.md) dan pastikan seluruh field JSON yang dikirimkan backend memiliki representasi visual di UI layar mobile.
+  2. Selaraskan seluruh nilai enum (misal: level sentimen AI `'green'`, `'yellow'`, `'red'`) agar tidak jatuh ke silent fallback default.
+  3. Gunakan `DataInspectorSheet` untuk memverifikasi keselarasan payload mentah vs rendered state langsung dari HP/emulator.
+
 ---
 
 ## 2. Standard Development Flow (SOP)

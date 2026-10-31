@@ -3,12 +3,15 @@ import 'core/api/api_endpoints.dart';
 import 'core/storage/secure_storage.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/mentor/mentor_home_screen.dart';
 import 'screens/parent/parent_home_screen.dart';
 import 'screens/student/student_home_screen.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ApiEndpoints.init();
+  await NotificationService.init();
   runApp(const AinaraApp());
 }
 
@@ -50,10 +53,13 @@ class _AuthGateState extends State<AuthGate> {
     setState(() {
       _isLoading = false;
       if (token != null && role != null) {
+        NotificationService.syncTokenWithBackend();
         if (role == 'student') {
           _targetScreen = const StudentHomeScreen();
         } else if (role == 'parent') {
           _targetScreen = const ParentHomeScreen();
+        } else if (role == 'mentor') {
+          _targetScreen = const MentorHomeScreen();
         } else {
           _targetScreen = const LoginScreen();
         }

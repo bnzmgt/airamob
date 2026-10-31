@@ -66,10 +66,24 @@ class ApiEndpoints {
 
   // Parent Child Dedicated Reports & Exports
   static String parentChildReports(int studentId) => '$baseUrl/parent/students/$studentId/reports';
+  static String parentChildMentorReports(int studentId) => '$baseUrl/parent/students/$studentId/mentor-reports';
+  static String parentMentorReportDetail(int id) => '$baseUrl/parent/mentor-reports/$id';
   static String get parentReportsExportCsv => '$baseUrl/parent/reports/export/csv';
   static String get parentReportsExportPdf => '$baseUrl/parent/reports/export/pdf';
   static String parentChildExportCsv(int studentId) => '$baseUrl/parent/students/$studentId/export/csv';
   static String parentChildExportPdf(int studentId) => '$baseUrl/parent/students/$studentId/export/pdf';
+
+  // Student Mentor Reports
+  static String get studentMentorReports => '$baseUrl/student/mentor-reports';
+
+  // Mentor Endpoints
+  static String get mentorDashboard => '$baseUrl/mentor/dashboard';
+  static String get mentorStudents => '$baseUrl/mentor/students';
+  static String get mentorAvailableStudents => '$baseUrl/mentor/available-students';
+  static String get mentorAttachStudent => '$baseUrl/mentor/students';
+  static String mentorDetachStudent(int studentId) => '$baseUrl/mentor/students/$studentId';
+  static String get mentorReports => '$baseUrl/mentor/reports';
+  static String mentorReportDetail(int id) => '$baseUrl/mentor/reports/$id';
 
   // Safeguarding Public Tracking
   static String trackSafeguarding(String code) => '$baseUrl/safeguarding/track/$code';

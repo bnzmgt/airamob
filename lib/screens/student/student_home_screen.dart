@@ -3,6 +3,7 @@ import '../../core/api/api_client.dart';
 import '../../core/api/api_endpoints.dart';
 import '../../core/storage/secure_storage.dart';
 import '../../core/theme/app_theme.dart';
+import '../../widgets/floating_nav_bar.dart';
 import '../auth/login_screen.dart';
 import '../reports/report_detail_screen.dart';
 import '../safeguarding/track_incident_screen.dart';
@@ -11,6 +12,7 @@ import 'submit_report_screen.dart';
 import 'edit_report_screen.dart';
 import 'student_incident_history_screen.dart';
 import 'student_reports_list_screen.dart';
+import '../../services/notification_service.dart';
 
 import '../profile/profile_screen.dart';
 
@@ -47,6 +49,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   }
 
   Future<void> _logout() async {
+    await NotificationService.unregisterToken();
     await ApiClient.post(ApiEndpoints.logout, {});
     await SecureStorage.clearSession();
     if (!mounted) return;
@@ -64,93 +67,80 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     final recentReports = (_dashboardData?['recent_reports'] as List?) ?? [];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AiNARA Siswa'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person_outline),
-            tooltip: 'Profil Saya',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              ).then((_) => _loadDashboard());
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Keluar',
-            onPressed: _logout,
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadDashboard,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Greeting Card
-                    Card(
-                      color: Colors.white,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(14),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                          ).then((_) => _loadDashboard());
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: AppTheme.primaryBlue, width: 2),
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
+            : RefreshIndicator(
+                onRefresh: _loadDashboard,
+                color: AppTheme.primaryBlue,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Modern Minimalist Top Bar (Replacing bulky AppBar)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Assalamu’alaikum,',
+                                  style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
                                 ),
-                                child: const CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: AppTheme.surfaceTint,
-                                  child: Icon(Icons.person, color: AppTheme.primaryBlue, size: 22),
+                                const SizedBox(height: 2),
+                                Text(
+                                  _studentName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: AppTheme.textPrimary,
+                                    letterSpacing: -0.3,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Assalamu’alaikum,',
-                                      style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      _studentName,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: AppTheme.textPrimary,
-                                      ),
-                                    ),
-                                  ],
+                                const SizedBox(height: 2),
+                                Text(
+                                  _dashboardData?['today_date'] ?? 'Portal Siswa',
+                                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
                                 ),
-                              ),
-                              const Icon(Icons.chevron_right, color: AppTheme.textMuted, size: 20),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                              ).then((_) => _loadDashboard());
+                            },
+                            borderRadius: BorderRadius.circular(24),
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppTheme.primaryBlue, width: 2),
+                              ),
+                              child: const CircleAvatar(
+                                radius: 18,
+                                backgroundColor: Color(0xFFEFF6FF),
+                                child: Icon(Icons.person, color: AppTheme.primaryBlue, size: 20),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                            icon: const Icon(Icons.logout, color: AppTheme.textMuted, size: 20),
+                            tooltip: 'Keluar',
+                            onPressed: _logout,
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Today's Report Status Card
+                      // Today's Report Status Card
                     Card(
                       color: Colors.white,
                       child: Padding(
@@ -501,6 +491,51 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                 ),
               ),
             ),
+      ),
+      bottomNavigationBar: FloatingNavBar(
+        currentIndex: 0,
+        onTap: (index) {
+          if (index == 0) return;
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const StudentReportsListScreen()),
+            ).then((_) => _loadDashboard());
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const StudentIncidentHistoryScreen()),
+            ).then((_) => _loadDashboard());
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ).then((_) => _loadDashboard());
+          }
+        },
+        items: const [
+          FloatingNavItem(
+            icon: Icons.home_outlined,
+            activeIcon: Icons.home,
+            label: '',
+          ),
+          FloatingNavItem(
+            icon: Icons.menu_book_outlined,
+            activeIcon: Icons.menu_book,
+            label: 'Laporan',
+          ),
+          FloatingNavItem(
+            icon: Icons.shield_outlined,
+            activeIcon: Icons.shield,
+            label: 'LANTANG',
+          ),
+          FloatingNavItem(
+            icon: Icons.person_outline,
+            activeIcon: Icons.person,
+            label: 'Akun',
+          ),
+        ],
+      ),
     );
   }
 }

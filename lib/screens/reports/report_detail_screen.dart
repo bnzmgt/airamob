@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/api_endpoints.dart';
+import '../../core/debug/data_inspector_sheet.dart';
 import '../../core/theme/app_theme.dart';
 import '../student/edit_report_screen.dart';
 
@@ -234,7 +235,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                             setSheetState(() => _isSendingAppreciation = true);
                             setState(() => _isSendingAppreciation = true);
 
-                            final url = '${ApiEndpoints.parentReports}/${widget.reportId}/appreciate';
+                            final url = ApiEndpoints.parentAppreciate(widget.reportId);
                             final res = await ApiClient.post(url, {
                               'reaction_type': _selectedReaction,
                               'message': _appreciationMsgController.text.trim(),
@@ -286,26 +287,32 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
   }
 
   Color _getSentimentColor(String? sentiment) {
-    switch (sentiment) {
+    switch (sentiment?.toLowerCase()) {
+      case 'green':
       case 'positive':
         return const Color(0xFF10B981);
+      case 'yellow':
       case 'neutral':
-        return AppTheme.primaryBlue;
+        return const Color(0xFFF59E0B);
+      case 'red':
       case 'negative':
-        return AppTheme.secondaryTangerine;
+        return const Color(0xFFEF4444);
       default:
         return AppTheme.textMuted;
     }
   }
 
   String _getSentimentLabel(String? sentiment) {
-    switch (sentiment) {
+    switch (sentiment?.toLowerCase()) {
+      case 'green':
       case 'positive':
-        return '● Kondisi Positif';
+        return '● Kondisi Normal';
+      case 'yellow':
       case 'neutral':
-        return '● Kondisi Stabil';
-      case 'negative':
         return '● Perlu Perhatian';
+      case 'red':
+      case 'negative':
+        return '● Intervensi Segera';
       default:
         return '● Evaluasi Rutin';
     }
@@ -331,6 +338,35 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                 if (res == true) {
                   _loadReport();
                 }
+              },
+            ),
+          if (_report != null)
+            IconButton(
+              icon: const Icon(Icons.analytics_outlined),
+              tooltip: 'Audit Data API (Inspector)',
+              onPressed: () {
+                DataInspectorSheet.show(
+                  context,
+                  screenName: 'Detail Laporan Belajar',
+                  endpoint: ApiEndpoints.studentReportUpdate(widget.reportId),
+                  payload: _report!,
+                  renderedKeys: [
+                    'id',
+                    'student',
+                    'report_date',
+                    'content',
+                    'happy_moment',
+                    'frustrated_moment',
+                    'photo_url',
+                    'ai_tags',
+                    'sentiment_level',
+                    'ai_parent_guidance',
+                    'submitted_at',
+                    'my_appreciation',
+                    'all_appreciations',
+                    'appreciations',
+                  ],
+                );
               },
             ),
           IconButton(

@@ -4,9 +4,11 @@ import '../../core/api/api_client.dart';
 import '../../core/api/api_endpoints.dart';
 import '../../core/storage/secure_storage.dart';
 import '../../core/theme/app_theme.dart';
+import '../mentor/mentor_home_screen.dart';
 import '../parent/parent_home_screen.dart';
 import '../safeguarding/track_incident_screen.dart';
 import '../student/student_home_screen.dart';
+import '../../services/notification_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -61,6 +63,9 @@ class _LoginScreenState extends State<LoginScreen> {
         email: user['email'] ?? '',
       );
 
+      // Register device FCM token with backend
+      NotificationService.syncTokenWithBackend();
+
       if (!mounted) return;
 
       if (role == 'student') {
@@ -72,6 +77,11 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const ParentHomeScreen()),
+        );
+      } else if (role == 'mentor') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MentorHomeScreen()),
         );
       } else {
         setState(() => _errorMessage = 'Peran akun ($role) disarankan login melalui panel admin web.');
@@ -278,27 +288,27 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 // Header Logo
                 Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(18),
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      height: 76,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: AppTheme.borderDefault),
-                        ),
-                        child: const Icon(Icons.school, size: 50, color: AppTheme.primaryBlue),
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    height: 80,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.medium,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 80,
+                      height: 80,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: AppTheme.borderDefault),
                       ),
+                      child: const Icon(Icons.school, size: 40, color: AppTheme.primaryBlue),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'AiNARA Mobile',
+                  'AiNARA',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,
@@ -358,7 +368,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 22,
                           child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                         )
-                      : const Text('Masuk Aplikasi'),
+                      : const Text('Masuk'),
                 ),
                 const SizedBox(height: 28),
 
@@ -372,7 +382,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   icon: const Icon(Icons.shield_outlined, color: AppTheme.primaryBlue),
                   label: const Text(
-                    'Lacak Tiket Aduan LANTANG (Tanpa Login)',
+                    'Lacak Tiket Aduan LANTANG',
                     style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.w600),
                   ),
                 ),

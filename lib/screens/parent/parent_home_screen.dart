@@ -8,6 +8,8 @@ import '../auth/login_screen.dart';
 import '../reports/report_detail_screen.dart';
 import '../profile/profile_screen.dart';
 import 'child_reports_screen.dart';
+import '../../services/notification_service.dart';
+import '../../widgets/floating_nav_bar.dart';
 
 class ParentHomeScreen extends StatefulWidget {
   const ParentHomeScreen({super.key});
@@ -311,93 +313,89 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
     final hasActiveFilter = _selectedStudentId != null || _fromDate != null || _toDate != null;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AiNARA Parent'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Segarkan Data',
-            onPressed: _loadData,
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline),
-            tooltip: 'Profil Saya',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              ).then((_) => _loadData());
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Keluar Akun',
-            onPressed: () async {
-              await ApiClient.post(ApiEndpoints.logout, {});
-              await SecureStorage.clearSession();
-              if (context.mounted) {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
-              }
-            },
-          ),
-        ],
-      ),
-      body: _isLoading && _children.isEmpty
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
-          : RefreshIndicator(
-              onRefresh: _loadData,
-              color: AppTheme.primaryBlue,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Header card
-                    Card(
-                      elevation: 0,
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        side: const BorderSide(color: AppTheme.cardBorder),
-                      ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(14),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                          ).then((_) => _loadData());
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              const CircleAvatar(
-                                backgroundColor: Color(0xFFEFF6FF),
-                                child: Icon(Icons.family_restroom, color: AppTheme.primaryBlue),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Bapak / Ibu,', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-                                    Text(_parentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary)),
-                                  ],
+      body: SafeArea(
+        child: _isLoading && _children.isEmpty
+            ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
+            : RefreshIndicator(
+                onRefresh: _loadData,
+                color: AppTheme.primaryBlue,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Modern Minimalist Top Bar (Replacing bulky AppBar)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Assalamu’alaikum,',
+                                  style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
                                 ),
-                              ),
-                              const Icon(Icons.chevron_right, size: 20, color: AppTheme.textMuted),
-                            ],
+                                const SizedBox(height: 2),
+                                Text(
+                                  _parentName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: AppTheme.textPrimary,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                const Text(
+                                  'Portal Orang Tua & Wali',
+                                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                              ).then((_) => _loadData());
+                            },
+                            borderRadius: BorderRadius.circular(24),
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppTheme.primaryBlue, width: 2),
+                              ),
+                              child: const CircleAvatar(
+                                radius: 18,
+                                backgroundColor: Color(0xFFEFF6FF),
+                                child: Icon(Icons.family_restroom, color: AppTheme.primaryBlue, size: 20),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                            icon: const Icon(Icons.logout, color: AppTheme.textMuted, size: 20),
+                            tooltip: 'Keluar',
+                            onPressed: () async {
+                              await NotificationService.unregisterToken();
+                              await ApiClient.post(ApiEndpoints.logout, {});
+                              await SecureStorage.clearSession();
+                              if (context.mounted) {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                                  (route) => false,
+                                );
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 18),
+                      const SizedBox(height: 16),
 
                     // Connected children section
                     Row(
@@ -817,6 +815,75 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                 ),
               ),
             ),
+      ),
+      bottomNavigationBar: FloatingNavBar(
+        currentIndex: 0,
+        onTap: (index) {
+          if (index == 0) return;
+          if (index == 1) {
+            if (_children.isNotEmpty) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChildReportsScreen(
+                    studentId: _children.first['id'],
+                    initialStudentName: _children.first['name'],
+                    initialTab: 0,
+                  ),
+                ),
+              ).then((_) => _loadData());
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Belum ada ananda yang terhubung.')),
+              );
+            }
+          } else if (index == 2) {
+            if (_children.isNotEmpty) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChildReportsScreen(
+                    studentId: _children.first['id'],
+                    initialStudentName: _children.first['name'],
+                    initialTab: 1,
+                  ),
+                ),
+              ).then((_) => _loadData());
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Belum ada ananda yang terhubung.')),
+              );
+            }
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ).then((_) => _loadData());
+          }
+        },
+        items: const [
+          FloatingNavItem(
+            icon: Icons.home_outlined,
+            activeIcon: Icons.home,
+            label: '',
+          ),
+          FloatingNavItem(
+            icon: Icons.menu_book_outlined,
+            activeIcon: Icons.menu_book,
+            label: 'Laporan',
+          ),
+          FloatingNavItem(
+            icon: Icons.school_outlined,
+            activeIcon: Icons.school,
+            label: 'Les Privat',
+          ),
+          FloatingNavItem(
+            icon: Icons.person_outline,
+            activeIcon: Icons.person,
+            label: 'Akun',
+          ),
+        ],
+      ),
     );
   }
 }

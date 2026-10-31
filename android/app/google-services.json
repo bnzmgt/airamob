@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "778731200816",
+    "project_id": "ainara-app",
+    "storage_bucket": "ainara-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:778731200816:android:7dedbb47d701cc05f228f5",
+        "android_client_info": {
+          "package_name": "com.ainara.mobile.ainara_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEyZQ8p_lZLpP52Dzky2VC6pYxnou3w60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

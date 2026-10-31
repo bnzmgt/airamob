@@ -90,21 +90,27 @@ class _StudentReportsListScreenState extends State<StudentReportsListScreen> {
     Color borderColor = AppTheme.cardBorder;
     String label;
 
-    switch (sentiment) {
+    switch (sentiment?.toLowerCase()) {
+      case 'green':
       case 'positive':
         dotColor = const Color(0xFF10B981);
-        label = 'Positif';
+        label = 'Normal';
         break;
+      case 'yellow':
       case 'neutral':
-        dotColor = AppTheme.primaryBlue;
-        label = 'Stabil';
-        break;
-      case 'negative':
-        dotColor = AppTheme.secondaryTangerine;
+        dotColor = const Color(0xFFF59E0B);
         bg = AppTheme.amberSurface;
         borderColor = const Color(0xFFFDE68A);
         fg = AppTheme.amberText;
-        label = 'Evaluasi';
+        label = 'Perhatian';
+        break;
+      case 'red':
+      case 'negative':
+        dotColor = const Color(0xFFEF4444);
+        bg = const Color(0xFFFEE2E2);
+        borderColor = const Color(0xFFFECACA);
+        fg = const Color(0xFFB91C1C);
+        label = 'Intervensi';
         break;
       default:
         dotColor = AppTheme.textMuted;

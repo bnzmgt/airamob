@@ -29,7 +29,10 @@
    - Cards & Dialogs: `14px`
    - Inputs & Buttons: `12px`
    - Pills & Badges: `9999px` (Full pill)
-4. **Typography:** Clean sans-serif (`Plus Jakarta Sans` or `Inter`), strict weight hierarchy (Regular 400, Medium 500, SemiBold 600, Bold 700).
+4. **Typography (Disciplined Safeguard Trio):**
+   - **Headlines & Titles:** `Metrophobic` (SemiBold 600, Bold 700).
+   - **Body & Reporting Inputs:** `Chivo` (Regular 400, Medium 500, SemiBold 600).
+   - **Buttons, Badges & Labels:** `Plus Jakarta Sans` (SemiBold 600, Bold 700).
 
 ---
 

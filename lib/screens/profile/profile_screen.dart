@@ -6,6 +6,7 @@ import '../../core/api/api_client.dart';
 import '../../core/api/api_endpoints.dart';
 import '../../core/storage/secure_storage.dart';
 import '../../core/theme/app_theme.dart';
+import '../../services/notification_service.dart';
 import '../auth/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -19,9 +20,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
   Map<String, dynamic>? _user;
 
-  // Contact Form
+  // Profile & Contact Form
+  final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
+  final _specializationController = TextEditingController();
+  final _bioController = TextEditingController();
   XFile? _selectedAvatar;
   bool _isSavingContact = false;
 
@@ -44,8 +48,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _specializationController.dispose();
+    _bioController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
@@ -62,10 +69,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _isLoading = false;
       if (response.success && response.data != null) {
         _user = response.data;
+        _nameController.text = _user!['name'] ?? '';
         final profile = _user!['profile'] as Map<String, dynamic>?;
         if (profile != null) {
           _phoneController.text = profile['phone_number'] ?? '';
           _addressController.text = profile['address'] ?? '';
+          _specializationController.text = profile['specialization'] ?? '';
+          _bioController.text = profile['bio'] ?? '';
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -134,26 +144,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _saveContact() async {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nama lengkap tidak boleh kosong.'),
+          backgroundColor: AppTheme.destructive,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSavingContact = true);
+
+    final payload = <String, String>{
+      'name': name,
+      'phone_number': _phoneController.text.trim(),
+      'address': _addressController.text.trim(),
+    };
+
+    if (_user?['role'] == 'mentor') {
+      payload['specialization'] = _specializationController.text.trim();
+      payload['bio'] = _bioController.text.trim();
+    }
 
     ApiResponse res;
     if (_selectedAvatar != null) {
       res = await ApiClient.postMultipart(
         ApiEndpoints.updateContact,
-        {
-          'phone_number': _phoneController.text.trim(),
-          'address': _addressController.text.trim(),
-        },
+        payload,
         file: _selectedAvatar,
         fileField: 'avatar',
       );
     } else {
       res = await ApiClient.post(
         ApiEndpoints.updateContact,
-        {
-          'phone_number': _phoneController.text.trim(),
-          'address': _addressController.text.trim(),
-        },
+        payload,
       );
     }
 
@@ -169,7 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Data profil kontak berhasil disimpan!'),
+          content: Text('Data profil berhasil disimpan!'),
           backgroundColor: AppTheme.primaryBlue,
         ),
       );
@@ -253,6 +279,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  bool _isSyncingToken = false;
+
+  Future<void> _syncNotificationToken() async {
+    setState(() => _isSyncingToken = true);
+    final result = await NotificationService.testAndSyncToken();
+    if (!mounted) return;
+    setState(() => _isSyncingToken = false);
+
+    final success = result['success'] == true;
+    final message = result['message'] ?? (success ? 'Notifikasi aktif!' : 'Gagal');
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(success ? Icons.check_circle : Icons.error, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: success ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   Future<void> _confirmLogout() async {
     final shouldLogout = await showDialog<bool>(
       context: context,
@@ -281,6 +333,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     if (shouldLogout == true && mounted) {
+      await NotificationService.unregisterToken();
       await ApiClient.post(ApiEndpoints.logout, {});
       await SecureStorage.clearSession();
       if (mounted) {
@@ -346,6 +399,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final profile = _user?['profile'] as Map<String, dynamic>?;
     final role = _user?['role'] ?? 'user';
     final isStudent = role == 'student';
+    final isMentor = role == 'mentor';
+    final isParent = role == 'parent';
+
+    String roleLabel = 'Pengguna';
+    Color roleBadgeBg = const Color(0xFFEFF6FF);
+    Color roleBadgeBorder = const Color(0xFFBFDBFE);
+    Color roleBadgeText = AppTheme.primaryBlue;
+
+    if (isStudent) {
+      roleLabel = 'Siswa';
+      roleBadgeBg = const Color(0xFFEFF6FF);
+      roleBadgeBorder = const Color(0xFFBFDBFE);
+      roleBadgeText = AppTheme.primaryBlue;
+    } else if (isMentor) {
+      roleLabel = 'Mentor Les Privat';
+      roleBadgeBg = const Color(0xFFECFDF5);
+      roleBadgeBorder = const Color(0xFFA7F3D0);
+      roleBadgeText = const Color(0xFF047857);
+    } else if (isParent) {
+      roleLabel = 'Orang Tua / Wali';
+      roleBadgeBg = const Color(0xFFF5F3FF);
+      roleBadgeBorder = const Color(0xFFDDD6FE);
+      roleBadgeText = const Color(0xFF6D28D9);
+    }
 
     return Scaffold(
       backgroundColor: AppTheme.canvasColor,
@@ -420,14 +497,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFEFF6FF),
+                                    color: roleBadgeBg,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: const Color(0xFFBFDBFE)),
+                                    border: Border.all(color: roleBadgeBorder),
                                   ),
                                   child: Text(
-                                    isStudent ? 'Siswa' : 'Orang Tua / Wali',
-                                    style: const TextStyle(
-                                      color: AppTheme.primaryBlue,
+                                    roleLabel,
+                                    style: TextStyle(
+                                      color: roleBadgeText,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
                                     ),
@@ -482,6 +559,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ],
                               ),
+                            ] else if (isMentor && profile != null) ...[
+                              const SizedBox(height: 16),
+                              const Divider(height: 1, color: AppTheme.cardBorder),
+                              const SizedBox(height: 14),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Column(
+                                    children: [
+                                      const Text('Siswa Bimbingan Aktif', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        '${profile['active_students_count'] ?? 0} Siswa',
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+                                      ),
+                                    ],
+                                  ),
+                                  Container(height: 28, width: 1, color: AppTheme.cardBorder),
+                                  Column(
+                                    children: [
+                                      const Text('Spesialisasi', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        (profile['specialization'] != null && profile['specialization'].toString().isNotEmpty)
+                                            ? profile['specialization'].toString()
+                                            : 'Umum',
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ],
                           ],
                         ),
@@ -489,7 +598,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Contact Update Form Card
+                    // Contact & Profile Update Form Card
                     Card(
                       elevation: 0,
                       color: Colors.white,
@@ -504,15 +613,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             const Row(
                               children: [
-                                Icon(Icons.contact_phone_outlined, color: AppTheme.primaryBlue, size: 20),
+                                Icon(Icons.badge_outlined, color: AppTheme.primaryBlue, size: 20),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Informasi Kontak & Alamat',
+                                  'Informasi Profil & Kontak',
                                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 14),
+                            TextField(
+                              controller: _nameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Nama Lengkap',
+                                hintText: 'Nama lengkap Anda',
+                                prefixIcon: Icon(Icons.person_outline, size: 20),
+                              ),
+                            ),
+                            if (isMentor) ...[
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _specializationController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Spesialisasi Mata Pelajaran',
+                                  hintText: 'Contoh: Matematika, Fisika SMA',
+                                  prefixIcon: Icon(Icons.menu_book_outlined, size: 20),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _bioController,
+                                maxLines: 3,
+                                decoration: const InputDecoration(
+                                  labelText: 'Bio / Riwayat Singkat Mengajar',
+                                  hintText: 'Tuliskan profil singkat atau pendekatan les privat Anda...',
+                                  prefixIcon: Icon(Icons.notes_outlined, size: 20),
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: 12),
                             TextField(
                               controller: _phoneController,
                               keyboardType: TextInputType.phone,
@@ -575,7 +714,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       height: 20,
                                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                     )
-                                  : const Text('Simpan Perubahan Kontak', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                  : const Text('Simpan Perubahan Profil', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                             ),
                           ],
                         ),
@@ -661,6 +800,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                     )
                                   : const Text('Perbarui Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Notification & Device Status Card
+                    Card(
+                      elevation: 0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: AppTheme.cardBorder),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEFF6FF),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(Icons.notifications_active_outlined, color: AppTheme.primaryBlue, size: 20),
+                                ),
+                                const SizedBox(width: 10),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Notifikasi & Perangkat',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary),
+                                      ),
+                                      Text(
+                                        'Status sambungan push notification Firebase',
+                                        style: TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            const Divider(height: 1, color: AppTheme.cardBorder),
+                            const SizedBox(height: 14),
+                            ElevatedButton.icon(
+                              onPressed: _isSyncingToken ? null : _syncNotificationToken,
+                              icon: _isSyncingToken
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                    )
+                                  : const Icon(Icons.sync, size: 18, color: Colors.white),
+                              label: Text(
+                                _isSyncingToken ? 'Menghubungkan...' : 'Sinkronkan Notifikasi Handphone Ini',
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 13),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primaryBlue,
+                                minimumSize: const Size(double.infinity, 44),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                elevation: 0,
+                              ),
                             ),
                           ],
                         ),

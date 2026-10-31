@@ -3,16 +3,21 @@ import '../../core/api/api_client.dart';
 import '../../core/api/api_endpoints.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/file_downloader.dart';
+import '../../models/mentor_report.dart';
+import '../../services/mentor_service.dart';
+import '../mentor/mentor_report_detail_screen.dart';
 import '../reports/report_detail_screen.dart';
 
 class ChildReportsScreen extends StatefulWidget {
   final int studentId;
   final String? initialStudentName;
+  final int initialTab;
 
   const ChildReportsScreen({
     super.key,
     required this.studentId,
     this.initialStudentName,
+    this.initialTab = 0,
   });
 
   @override
@@ -32,10 +37,20 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
   DateTime? _fromDate;
   DateTime? _toDate;
 
+  int _selectedTab = 0; // 0: Mandiri, 1: Les Privat
+  bool _isLoadingMentorReports = false;
+  List<MentorReport> _mentorReports = [];
+  String? _mentorReportsError;
+
   @override
   void initState() {
     super.initState();
-    _loadReports();
+    _selectedTab = widget.initialTab;
+    if (_selectedTab == 0) {
+      _loadReports();
+    } else {
+      _loadMentorReports();
+    }
   }
 
   String _formatDate(DateTime dt) {
@@ -131,6 +146,32 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
       _toDate = null;
     });
     _loadReports(page: 1);
+  }
+
+  Future<void> _loadMentorReports() async {
+    setState(() {
+      _isLoadingMentorReports = true;
+      _mentorReportsError = null;
+    });
+
+    final response = await MentorService.getParentChildMentorReports(widget.studentId);
+    if (!mounted) return;
+
+    if (response.success && response.data is Map) {
+      final data = response.data as Map<String, dynamic>;
+      final reports = data['reports'] as List? ?? [];
+      setState(() {
+        _isLoadingMentorReports = false;
+        _mentorReports = reports
+            .map((r) => MentorReport.fromJson(r as Map<String, dynamic>))
+            .toList();
+      });
+    } else {
+      setState(() {
+        _isLoadingMentorReports = false;
+        _mentorReportsError = response.message ?? 'Gagal memuat laporan bimbingan les.';
+      });
+    }
   }
 
   Future<void> _exportData(bool isPdf) async {
@@ -324,14 +365,26 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Segarkan',
-            onPressed: () => _loadReports(page: _currentPage),
+            onPressed: () {
+              if (_selectedTab == 0) {
+                _loadReports(page: _currentPage);
+              } else {
+                _loadMentorReports();
+              }
+            },
           ),
         ],
       ),
       body: _isLoading && _student == null
           ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
           : RefreshIndicator(
-              onRefresh: () => _loadReports(page: 1),
+              onRefresh: () async {
+                if (_selectedTab == 0) {
+                  await _loadReports(page: 1);
+                } else {
+                  await _loadMentorReports();
+                }
+              },
               color: AppTheme.primaryBlue,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -403,8 +456,86 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                     ),
                     const SizedBox(height: 14),
 
-                    // Filter & Export Card
-                    Card(
+                    // Tab Switcher (Belajar Mandiri vs Les Privat)
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppTheme.cardBorder),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {
+                                if (_selectedTab != 0) {
+                                  setState(() => _selectedTab = 0);
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: _selectedTab == 0 ? AppTheme.primaryBlue : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Laporan Mandiri',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: _selectedTab == 0 ? Colors.white : AppTheme.textMuted,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {
+                                if (_selectedTab != 1) {
+                                  setState(() => _selectedTab = 1);
+                                  if (_mentorReports.isEmpty) {
+                                    _loadMentorReports();
+                                  }
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: _selectedTab == 1 ? const Color(0xFF7E22CE) : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                alignment: Alignment.center,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text('🎓 '),
+                                    Text(
+                                      'Les Privat (Mentor)',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: _selectedTab == 1 ? Colors.white : AppTheme.textMuted,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    if (_selectedTab == 0) ...[
+                      // Filter & Export Card
+                      Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -717,10 +848,193 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
                         ],
                       ),
                     ],
+                  ] else ...[
+                    _buildMentorReportsView(),
+                  ],
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
+  Widget _buildMentorReportsView() {
+    if (_isLoadingMentorReports) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 40),
+        child: Center(child: CircularProgressIndicator(color: Color(0xFF7E22CE))),
+      );
+    }
+
+    if (_mentorReportsError != null) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF1F2),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFFECDD3)),
+        ),
+        child: Column(
+          children: [
+            const Icon(Icons.error_outline, color: AppTheme.errorRed, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              _mentorReportsError!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppTheme.errorRed, fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _loadMentorReports,
+              child: const Text('Coba Lagi'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_mentorReports.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.cardBorder),
+        ),
+        child: const Column(
+          children: [
+            Icon(Icons.school_outlined, size: 48, color: Color(0xFF7E22CE)),
+            SizedBox(height: 12),
+            Text(
+              'Belum Ada Laporan Les Privat',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Mentor les privat ananda belum menginput laporan bimbingan belajar.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Total ${_mentorReports.length} Sesi Bimbingan',
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh, size: 18, color: Color(0xFF7E22CE)),
+              onPressed: _loadMentorReports,
+              tooltip: 'Segarkan',
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _mentorReports.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final report = _mentorReports[index];
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MentorReportDetailScreen(
+                      reportId: report.id,
+                      initialReport: report,
+                    ),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.cardBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3E8FF),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '📚 ${report.subject}',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF7E22CE)),
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: report.understandingBgColor,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: report.understandingColor.withOpacity(0.3)),
+                          ),
+                          child: Text(
+                            report.understandingLabel,
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: report.understandingColor),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      report.materialTaught,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      report.studentProgress,
+                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Divider(height: 20, color: AppTheme.cardBorder),
+                    Row(
+                      children: [
+                        const Icon(Icons.person_outline, size: 14, color: AppTheme.textMuted),
+                        const SizedBox(width: 4),
+                        Text(
+                          report.mentorName ?? 'Mentor',
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMuted),
+                        ),
+                        const Spacer(),
+                        const Icon(Icons.calendar_today_outlined, size: 12, color: AppTheme.textMuted),
+                        const SizedBox(width: 4),
+                        Text(
+                          report.sessionDateFormatted ?? report.sessionDate,
+                          style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-            ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

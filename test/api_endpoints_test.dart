@@ -40,6 +40,17 @@ void main() {
       expect(ApiEndpoints.trackSafeguarding('SA-1234'), '$customUrl/safeguarding/track/SA-1234');
       expect(ApiEndpoints.pingCheck, '$customUrl/safeguarding/track/PING-CHECK');
 
+      // Mentor Endpoints
+      expect(ApiEndpoints.mentorDashboard, '$customUrl/mentor/dashboard');
+      expect(ApiEndpoints.mentorStudents, '$customUrl/mentor/students');
+      expect(ApiEndpoints.mentorAvailableStudents, '$customUrl/mentor/available-students');
+      expect(ApiEndpoints.mentorAttachStudent, '$customUrl/mentor/students');
+      expect(ApiEndpoints.mentorDetachStudent(7), '$customUrl/mentor/students/7');
+      expect(ApiEndpoints.mentorReports, '$customUrl/mentor/reports');
+      expect(ApiEndpoints.mentorReportDetail(10), '$customUrl/mentor/reports/10');
+      expect(ApiEndpoints.parentChildMentorReports(5), '$customUrl/parent/students/5/mentor-reports');
+      expect(ApiEndpoints.studentMentorReports, '$customUrl/student/mentor-reports');
+
       // Reset back to default
       ApiEndpoints.setBaseUrl(ApiEndpoints.defaultBaseUrl);
       expect(ApiEndpoints.baseUrl, ApiEndpoints.defaultBaseUrl);

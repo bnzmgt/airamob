@@ -3,6 +3,7 @@ plugins {
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"
 }
 
 def localProperties = new Properties()
@@ -26,9 +27,10 @@ if (flutterVersionName == null) {
 android {
     namespace = "com.ainara.mobile.ainara_mobile"
     compileSdk = 36
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -46,6 +48,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -55,8 +58,32 @@ android {
             signingConfig = signingConfigs.debug
         }
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def abi = output.getFilter(com.android.build.OutputFile.ABI)
+            if (abi != null) {
+                outputFileName = "AiNARA-v${variant.versionName}-${abi}.apk"
+            } else {
+                outputFileName = "AiNARA-v${variant.versionName}.apk"
+            }
+        }
+        variant.assembleProvider.configure {
+            doLast {
+                copy {
+                    from "${layout.buildDirectory.get()}/outputs/apk/${variant.name}"
+                    into "${layout.buildDirectory.get()}/outputs/flutter-apk"
+                    include "AiNARA-*.apk"
+                }
+            }
+        }
+    }
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 }
