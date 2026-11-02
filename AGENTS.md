@@ -45,6 +45,10 @@ Dokumen ini adalah panduan baku dan *ground truth rules* bagi AI Agent dan Devel
   2. Selaraskan seluruh nilai enum (misal: level sentimen AI `'green'`, `'yellow'`, `'red'`) agar tidak jatuh ke silent fallback default.
   3. Gunakan `DataInspectorSheet` untuk memverifikasi keselarasan payload mentah vs rendered state langsung dari HP/emulator.
 
+### 🛑 Rule 8: Voice Note / Audio Reflection Hard Freeze (Strict Guardrail — MUTLAK!)
+- Fitur **Voice Note & Audio Reflection** berada dalam status **STRICTLY FROZEN (DITUNDA / DIBEKUKAN MUTLAK)**.
+- **DILARANG KERAS** menambahkan dependency audio recorder/player (`record`, `audioplayers`, dll.) ke `pubspec.yaml`, membuat UI mic button, atau menulis service audio apapun sampai ada instruksi dan persetujuan eksplisit dari USER.
+
 ---
 
 ## 2. Standard Development Flow (SOP)
