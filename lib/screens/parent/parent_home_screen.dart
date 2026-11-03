@@ -288,6 +288,267 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
     );
   }
 
+  void _showAbsenceDialog({dynamic defaultChild}) {
+    if (_children.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tidak ada profil ananda yang terhubung.'),
+          backgroundColor: AppTheme.destructive,
+        ),
+      );
+      return;
+    }
+
+    int selectedStudentId = defaultChild?['id'] ?? _children.first['id'];
+    DateTime selectedDate = DateTime.now();
+    String selectedCategory = 'sick';
+    final noteController = TextEditingController();
+    bool isSubmitting = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: AppTheme.cardBorder),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.event_busy_outlined, color: AppTheme.primaryBlue, size: 22),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Pengajuan Izin / Sakit Ananda',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text('Pilih Ananda:', style: TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppTheme.cardBorder),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<int>(
+                      value: selectedStudentId,
+                      isExpanded: true,
+                      items: _children.map<DropdownMenuItem<int>>((c) {
+                        return DropdownMenuItem<int>(
+                          value: c['id'] as int,
+                          child: Text(
+                            '${c['name']} (Kelas ${c['class_name'] ?? '-'})',
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setDialogState(() => selectedStudentId = val);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const Text('Tanggal Izin:', style: TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                InkWell(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate: selectedDate,
+                      firstDate: DateTime.now().subtract(const Duration(days: 7)),
+                      lastDate: DateTime.now().add(const Duration(days: 30)),
+                    );
+                    if (picked != null) {
+                      setDialogState(() => selectedDate = picked);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppTheme.cardBorder),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _formatDate(selectedDate),
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                        ),
+                        const Icon(Icons.calendar_today_outlined, size: 16, color: AppTheme.primaryBlue),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const Text('Kategori Izin:', style: TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _buildCategoryChip('sick', 'Sakit', Icons.healing_outlined, selectedCategory, (cat) {
+                      setDialogState(() => selectedCategory = cat);
+                    }),
+                    const SizedBox(width: 8),
+                    _buildCategoryChip('family_event', 'Acara Keluarga', Icons.family_restroom, selectedCategory, (cat) {
+                      setDialogState(() => selectedCategory = cat);
+                    }),
+                    const SizedBox(width: 8),
+                    _buildCategoryChip('other', 'Lainnya', Icons.notes_outlined, selectedCategory, (cat) {
+                      setDialogState(() => selectedCategory = cat);
+                    }),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                const Text('Keterangan / Alasan:', style: TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: noteController,
+                  maxLength: 500,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    hintText: 'Contoh: Demam sejak semalam, istirahat di rumah sesuai anjuran dokter...',
+                    hintStyle: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                    contentPadding: EdgeInsets.all(12),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFBFDBFE)),
+                  ),
+                  child: const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.info_outline, size: 16, color: AppTheme.primaryBlue),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Izin ini akan otomatis membebaskan ananda dari pengingat laporan harian untuk tanggal tersebut.',
+                          style: TextStyle(fontSize: 11, color: AppTheme.textPrimary, height: 1.3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: isSubmitting
+                  ? null
+                  : () async {
+                      if (noteController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Harap tuliskan alasan atau keterangan izin.'),
+                            backgroundColor: AppTheme.destructive,
+                          ),
+                        );
+                        return;
+                      }
+
+                      setDialogState(() => isSubmitting = true);
+                      final res = await ApiClient.post(
+                        ApiEndpoints.parentAbsences,
+                        {
+                          'student_id': selectedStudentId,
+                          'absence_date': _formatDate(selectedDate),
+                          'category': selectedCategory,
+                          'reason': noteController.text.trim(),
+                        },
+                      );
+
+                      if (ctx.mounted) {
+                        Navigator.pop(ctx);
+                      }
+                      if (!mounted) return;
+
+                      if (res.success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Pengajuan izin ananda berhasil dicatat.'),
+                            backgroundColor: AppTheme.primaryBlue,
+                          ),
+                        );
+                        _loadData();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(res.message ?? 'Gagal mengajukan izin'),
+                            backgroundColor: AppTheme.destructive,
+                          ),
+                        );
+                      }
+                    },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
+              child: isSubmitting
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  : const Text('Kirim Pengajuan'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryChip(String key, String label, IconData icon, String currentCategory, Function(String) onSelect) {
+    final isSelected = key == currentCategory;
+    return Expanded(
+      child: InkWell(
+        onTap: () => onSelect(key),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFFEFF6FF) : const Color(0xFFF8FAFC),
+            border: Border.all(
+              color: isSelected ? AppTheme.primaryBlue : AppTheme.cardBorder,
+              width: isSelected ? 1.5 : 1,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, size: 18, color: isSelected ? AppTheme.primaryBlue : AppTheme.textMuted),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? AppTheme.primaryBlue : AppTheme.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _navigateToReportDetail(int reportId) {
     Navigator.push(
       context,
@@ -420,6 +681,10 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                     const SizedBox(height: 10),
                     ..._children.map((child) {
                       final isSubmitted = child['is_submitted_today'] == true;
+                      final isExcused = child['is_excused_today'] == true;
+                      final absenceCat = child['today_excused_absence']?['category'] == 'sick'
+                          ? 'Izin Sakit'
+                          : (child['today_excused_absence']?['category'] == 'family_event' ? 'Izin Acara' : 'Izin Sah');
 
                       return Card(
                         elevation: 0,
@@ -459,9 +724,19 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: isSubmitted ? const Color(0xFFF1F5F9) : AppTheme.amberSurface,
+                                        color: isSubmitted
+                                            ? const Color(0xFFF1F5F9)
+                                            : (isExcused
+                                                ? const Color(0xFFEFF6FF)
+                                                : AppTheme.amberSurface),
                                         borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(color: isSubmitted ? AppTheme.cardBorder : const Color(0xFFFDE68A)),
+                                        border: Border.all(
+                                          color: isSubmitted
+                                              ? AppTheme.cardBorder
+                                              : (isExcused
+                                                  ? const Color(0xFFBFDBFE)
+                                                  : const Color(0xFFFDE68A)),
+                                        ),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
@@ -470,15 +745,23 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                             width: 6,
                                             height: 6,
                                             decoration: BoxDecoration(
-                                              color: isSubmitted ? const Color(0xFF10B981) : AppTheme.secondaryTangerine,
+                                              color: isSubmitted
+                                                  ? const Color(0xFF10B981)
+                                                  : (isExcused
+                                                      ? const Color(0xFF3B82F6)
+                                                      : AppTheme.secondaryTangerine),
                                               shape: BoxShape.circle,
                                             ),
                                           ),
                                           const SizedBox(width: 5),
                                           Text(
-                                            isSubmitted ? 'Sudah Lapor' : 'Belum Lapor',
+                                            isSubmitted
+                                                ? 'Sudah Lapor'
+                                                : (isExcused ? absenceCat : 'Belum Lapor'),
                                             style: TextStyle(
-                                              color: isSubmitted ? AppTheme.textPrimary : AppTheme.amberText,
+                                              color: isSubmitted
+                                                  ? AppTheme.textPrimary
+                                                  : (isExcused ? const Color(0xFF1D4ED8) : AppTheme.amberText),
                                               fontWeight: FontWeight.bold,
                                               fontSize: 11,
                                             ),
@@ -505,6 +788,18 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                         ),
                       );
                     }),
+                    const SizedBox(height: 4),
+                    OutlinedButton.icon(
+                      onPressed: () => _showAbsenceDialog(),
+                      icon: const Icon(Icons.event_busy_outlined, size: 16, color: AppTheme.primaryBlue),
+                      label: const Text('Ajukan Izin / Sakit Ananda', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFFBFDBFE)),
+                        backgroundColor: const Color(0xFFF8FAFC),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
+                      ),
+                    ),
                     const SizedBox(height: 18),
 
                     // Reports feed header & filter section

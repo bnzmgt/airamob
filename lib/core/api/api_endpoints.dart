@@ -54,6 +54,7 @@ class ApiEndpoints {
 
   // Student Endpoints
   static String get studentDashboard => '$baseUrl/student/dashboard';
+  static String get studentDailyQuote => '$baseUrl/student/daily-quote';
   static String get studentReports => '$baseUrl/student/reports';
   static String studentReportUpdate(int id) => '$baseUrl/student/reports/$id';
   static String get studentSafeguarding => '$baseUrl/student/safeguarding/reports';
@@ -62,6 +63,7 @@ class ApiEndpoints {
   // Parent Endpoints
   static String get parentDashboard => '$baseUrl/parent/dashboard';
   static String get parentReports => '$baseUrl/parent/reports';
+  static String get parentAbsences => '$baseUrl/parent/absences';
   static String parentAppreciate(int reportId) => '$baseUrl/parent/reports/$reportId/appreciations';
 
   // Parent Child Dedicated Reports & Exports

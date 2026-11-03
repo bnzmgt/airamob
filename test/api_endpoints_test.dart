@@ -50,6 +50,8 @@ void main() {
       expect(ApiEndpoints.mentorReportDetail(10), '$customUrl/mentor/reports/10');
       expect(ApiEndpoints.parentChildMentorReports(5), '$customUrl/parent/students/5/mentor-reports');
       expect(ApiEndpoints.studentMentorReports, '$customUrl/student/mentor-reports');
+      expect(ApiEndpoints.studentDailyQuote, '$customUrl/student/daily-quote');
+      expect(ApiEndpoints.parentAbsences, '$customUrl/parent/absences');
 
       // Reset back to default
       ApiEndpoints.setBaseUrl(ApiEndpoints.defaultBaseUrl);

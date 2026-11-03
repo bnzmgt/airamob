@@ -63,6 +63,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isSubmittedToday = _dashboardData?['is_submitted_today'] ?? false;
+    final isExcusedToday = _dashboardData?['is_excused_today'] ?? false;
+    final todayExcusedAbsence = _dashboardData?['today_excused_absence'];
+    final dailyWisdom = _dashboardData?['daily_wisdom'];
     final todayReport = _dashboardData?['today_report'];
     final recentReports = (_dashboardData?['recent_reports'] as List?) ?? [];
 
@@ -140,6 +143,77 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      // Daily Rotating Student Wisdom Card
+                      if (dailyWisdom != null && (dailyWisdom['quote']?.toString().isNotEmpty ?? false)) ...[
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF2563EB).withOpacity(0.2),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.lightbulb_outline, color: Color(0xFFFDE047), size: 18),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Inspirasi Hari Ini',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  if (dailyWisdom['theme'] != null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        '#${dailyWisdom['theme']}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                '"${dailyWisdom['quote']}"',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.5,
+                                  height: 1.45,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+
                       // Today's Report Status Card
                     Card(
                       color: Colors.white,
@@ -162,16 +236,24 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: isSubmittedToday ? AppTheme.surfaceTint : AppTheme.amberSurface,
+                                    color: isExcusedToday
+                                        ? const Color(0xFFEFF6FF)
+                                        : (isSubmittedToday ? AppTheme.surfaceTint : AppTheme.amberSurface),
                                     borderRadius: BorderRadius.circular(9999),
                                     border: Border.all(
-                                      color: isSubmittedToday ? AppTheme.borderDefault : AppTheme.borderAmber,
+                                      color: isExcusedToday
+                                          ? const Color(0xFFBFDBFE)
+                                          : (isSubmittedToday ? AppTheme.borderDefault : AppTheme.borderAmber),
                                     ),
                                   ),
                                   child: Text(
-                                    isSubmittedToday ? '● Sudah Kirim' : '● Belum Lapor',
+                                    isExcusedToday
+                                        ? '● Izin Sah (EXCUSED)'
+                                        : (isSubmittedToday ? '● Sudah Kirim' : '● Belum Lapor'),
                                     style: TextStyle(
-                                      color: isSubmittedToday ? AppTheme.success : AppTheme.secondaryTangerine,
+                                      color: isExcusedToday
+                                          ? AppTheme.primaryBlue
+                                          : (isSubmittedToday ? AppTheme.success : AppTheme.secondaryTangerine),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 11,
                                       letterSpacing: 0.2,
@@ -260,6 +342,40 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                     ),
                                   ),
                                 ],
+                              ),
+                            ] else if (isExcusedToday) ...[
+                              Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEFF6FF),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: const Color(0xFFBFDBFE)),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(Icons.verified_outlined, color: AppTheme.primaryBlue, size: 24),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Status Hari Ini: Izin Sah (${todayExcusedAbsence?['reason_label'] ?? 'Izin'})',
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: AppTheme.primaryBlue),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            (todayExcusedAbsence?['notes']?.toString().trim().isNotEmpty ?? false)
+                                                ? 'Catatan orang tua: "${todayExcusedAbsence?['notes']}"'
+                                                : 'Orang tua telah mencatat izin resmi hari ini. Beristirahatlah dengan baik untuk memulihkan energimu.',
+                                            style: const TextStyle(fontSize: 12.5, color: AppTheme.textSecondary, height: 1.4),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ] else ...[
                               const Text(

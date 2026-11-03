@@ -89,18 +89,18 @@ Dokumen ini adalah **Single Source of Truth** untuk melacak keselarasan (*parity
 
 ---
 
-## 8. Modul Psychological Well-Being, AI & Smart Engagement (Phase 18 — Planned)
+## 8. Modul Psychological Well-Being, AI & Smart Engagement (Phase 18)
 
 | Endpoint Backend | Method | Payload / Data Dikirim | Screen Mobile | Status | Catatan Keselarasan |
 | :--- | :---: | :--- | :--- | :---: | :--- |
 | `/api/v1/student/reports` & `/{id}` | POST / PUT | Multi-part: `audio` | Form Laporan Siswa | ❄️ FROZEN | DIBEKUKAN MUTLAK (tidak dikerjakan tanpa approval). |
 | `/api/v1/student/reports/{id}` & `/parent/reports/{id}` | GET | `ai_parent_guidance` | `ReportDetailScreen` | 📋 Planned | Panduan obrolan hangat orang tua yang selalu aktif (Green/Yellow/Red). |
-| `/api/v1/student/daily-quote` | GET | `quote_text`, `theme` | `StudentHomeScreen` | 📋 Planned | Banner quote inspirasi harian global untuk seluruh siswa (cached). |
-| `/api/v1/parent/excused-absences` | POST | `student_id`, `absence_date`, `reason_category`, `notes`, `attachment` | `SubmitAbsenceModal` | 📋 Planned | Pengajuan resmi izin/sakit anak oleh orang tua (status `EXCUSED`). |
+| `/api/v1/student/daily-quote` | GET | `quote`, `theme`, `date` | `StudentHomeScreen` | 🟢 100% Selaras | Banner quote inspirasi harian global untuk seluruh siswa (cached harian & fallback). |
+| `/api/v1/parent/absences` | GET / POST | `student_id`, `absence_date`, `category`, `reason`, `attachment` | `ParentHomeScreen` & Dialog | 🟢 100% Selaras | Pengajuan izin/sakit anak oleh orang tua (status `EXCUSED`), bypass pengingat otomatis. |
 | `/api/v1/weekly-evaluations/{id}` | GET | `parent_report_narrative`, `student_reflection_narrative`, `compliance_rate`, `missing_days` | `WeeklyDigestSheet` | 📋 Planned | Laporan naratif mingguan AI di hari Sabtu (Parent & Student). |
 | `/api/v1/mentor/students/{id}/learning-gaps` | GET | `recent_frustrations`, `frequent_tags` | `SubmitMentorReportScreen` | 📋 Planned | Agregasi kendala belajar siswa untuk rekomendasi materi les privat. |
-| Background Dispatch (FCM HTTP v1) | PUSH | `title: "Hai [Nama]!"` (khusus siswa) | Push Notification Listener | 📋 Planned | Pengingat malam hari (20:00 WIB) jika siswa belum lapor. |
-| Background Dispatch (FCM HTTP v1) | PUSH | `title: "[Nama Anak] Baru Saja Mengirim Laporan Belajar"` (tanpa icon, tanpa body) | Push Notification Listener | 📋 Planned | Notifikasi instan ke HP orang tua saat anak kirim laporan harian. |
+| Background Dispatch (FCM HTTP v1) | PUSH | `title: "Hai [Nama]!"` (khusus siswa) | Push Notification Listener | 🟢 100% Selaras | Command `ainara:remind-unreported-students` jalan pukul 20:00 WIB jika siswa belum lapor & belum izin. |
+| Background Dispatch (FCM HTTP v1) | PUSH | `title: "[Nama Anak] Baru Saja Mengirim Laporan Belajar"` (tanpa icon, tanpa body) | Push Notification Listener | 🟢 100% Selaras | Notifikasi instan ke HP orang tua saat anak kirim laporan harian via web/mobile. |
 | Background Dispatch (FCM HTTP v1) | PUSH | `title: "Rangkuman Belajar Pekan Ini untuk [Nama Anak] Sudah Terbit"` (tanpa icon, tanpa body) | Push Notification Listener | 📋 Planned | Notifikasi ke HP orang tua saat laporan mingguan Sabtu terbit. |
 
 ---
