@@ -60,6 +60,104 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     );
   }
 
+  Widget _buildComplianceCard(Map<String, dynamic> compliance) {
+    final weekly = compliance['weekly'] as Map<String, dynamic>?;
+    final weeklyRate = (compliance['weekly_rate'] is num)
+        ? (compliance['weekly_rate'] as num).toDouble()
+        : 100.0;
+    final statusLabel = compliance['status_label']?.toString() ?? 'Sangat Baik';
+    final submittedCount = weekly?['submitted_count'] ?? 0;
+    final effectiveDays = weekly?['effective_school_days'] ?? 0;
+    final missingCount = weekly?['missing_count'] ?? 0;
+
+    final color = weeklyRate < 75.0
+        ? AppTheme.errorRed
+        : (weeklyRate < 90.0 ? AppTheme.secondaryTangerine : const Color(0xFF10B981));
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderDefault),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.verified_outlined, color: color, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Kedisiplinan Lapor Pekan Ini',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$submittedCount dari $effectiveDays hari efektif terlapor${missingCount > 0 ? " • $missingCount bolong" : ""}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppTheme.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: color.withOpacity(0.3)),
+                ),
+                child: Text(
+                  '${weeklyRate.toStringAsFixed(0)}% • $statusLabel',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: (weeklyRate / 100.0).clamp(0.0, 1.0),
+              minHeight: 6,
+              backgroundColor: const Color(0xFFF1F5F9),
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isSubmittedToday = _dashboardData?['is_submitted_today'] ?? false;
@@ -406,6 +504,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
+
+                    // Compliance & Discipline Tracking Card (Phase 18 Batch 4)
+                    if (_dashboardData?['compliance'] != null) ...[
+                      _buildComplianceCard(_dashboardData!['compliance'] as Map<String, dynamic>),
+                      const SizedBox(height: 16),
+                    ],
 
                     // LANTANG Safeguarding Quick Card (with 3px left accent border)
                     Container(

@@ -685,6 +685,9 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                       final absenceCat = child['today_excused_absence']?['category'] == 'sick'
                           ? 'Izin Sakit'
                           : (child['today_excused_absence']?['category'] == 'family_event' ? 'Izin Acara' : 'Izin Sah');
+                      final compliance = child['compliance'];
+                      final weeklyRate = (compliance?['weekly_rate'] is num) ? (compliance['weekly_rate'] as num).toDouble() : null;
+                      final statusLabel = compliance?['status_label']?.toString() ?? 'Sangat Baik';
 
                       return Card(
                         elevation: 0,
@@ -715,6 +718,31 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                         'Kelas ${child['class_name'] ?? '-'} • ${child['student_code'] ?? ''}',
                                         style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
                                       ),
+                                      if (weeklyRate != null) ...[
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.verified_outlined,
+                                              size: 13,
+                                              color: weeklyRate < 75.0
+                                                  ? AppTheme.errorRed
+                                                  : (weeklyRate < 90.0 ? AppTheme.secondaryTangerine : const Color(0xFF10B981)),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'Kepatuhan: ${weeklyRate.toStringAsFixed(0)}% ($statusLabel)',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                                color: weeklyRate < 75.0
+                                                    ? AppTheme.errorRed
+                                                    : (weeklyRate < 90.0 ? AppTheme.amberText : const Color(0xFF059669)),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ),

@@ -157,5 +157,58 @@ void main() {
             reason: 'LANTANG status "$status" must have recognized label mapping');
       }
     });
+
+    test('Compliance tracking payload schema contains all metrics fields', () {
+      final mockCompliancePayload = {
+        'weekly': {
+          'window_days': 7,
+          'start_date': '2026-10-25',
+          'end_date': '2026-10-31',
+          'effective_school_days': 6,
+          'submitted_count': 6,
+          'excused_count': 0,
+          'missing_count': 0,
+          'compliance_rate': 100.0,
+          'status_label': 'Sangat Baik',
+          'status_level': 'green',
+        },
+        'monthly': {
+          'window_days': 30,
+          'start_date': '2026-10-02',
+          'end_date': '2026-10-31',
+          'effective_school_days': 26,
+          'submitted_count': 25,
+          'excused_count': 1,
+          'missing_count': 1,
+          'compliance_rate': 96.2,
+          'status_label': 'Sangat Baik',
+          'status_level': 'green',
+        },
+        'weekly_rate': 100.0,
+        'monthly_rate': 96.2,
+        'missing_reports_weekly': 0,
+        'missing_reports_monthly': 1,
+        'status_label': 'Sangat Baik',
+        'status_level': 'green',
+      };
+
+      final requiredKeys = [
+        'weekly',
+        'monthly',
+        'weekly_rate',
+        'monthly_rate',
+        'missing_reports_weekly',
+        'missing_reports_monthly',
+        'status_label',
+        'status_level',
+      ];
+
+      for (final key in requiredKeys) {
+        expect(mockCompliancePayload.containsKey(key), isTrue,
+            reason: 'Compliance payload must contain key "$key"');
+      }
+      expect(mockCompliancePayload['weekly'], isA<Map>());
+      expect(mockCompliancePayload['monthly'], isA<Map>());
+    });
   });
 }
