@@ -11,6 +11,8 @@ import 'child_reports_screen.dart';
 import 'parent_all_reports_screen.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/floating_nav_bar.dart';
+import '../../models/weekly_evaluation.dart';
+import '../../widgets/weekly_evaluation_sheet.dart';
 
 class ParentHomeScreen extends StatefulWidget {
   const ParentHomeScreen({super.key});
@@ -701,66 +703,52 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                           onTap: () => _navigateToChildReports(child),
                           child: Padding(
                             padding: const EdgeInsets.all(14),
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                const CircleAvatar(
-                                  backgroundColor: Color(0xFFEFF6FF),
-                                  child: Icon(Icons.school_outlined, color: AppTheme.primaryBlue),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(child['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary)),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        'Kelas ${child['class_name'] ?? '-'} • ${child['student_code'] ?? ''}',
-                                        style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                                      ),
-                                      if (weeklyRate != null) ...[
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.verified_outlined,
-                                              size: 13,
-                                              color: weeklyRate < 75.0
-                                                  ? AppTheme.errorRed
-                                                  : (weeklyRate < 90.0 ? AppTheme.secondaryTangerine : const Color(0xFF10B981)),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              'Kepatuhan: ${weeklyRate.toStringAsFixed(0)}% ($statusLabel)',
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w600,
-                                                color: weeklyRate < 75.0
-                                                    ? AppTheme.errorRed
-                                                    : (weeklyRate < 90.0 ? AppTheme.amberText : const Color(0xFF059669)),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                // Row 1: Avatar, Name + Class, and Status Badge
+                                Row(
                                   children: [
+                                    const CircleAvatar(
+                                      radius: 19,
+                                      backgroundColor: Color(0xFFEFF6FF),
+                                      child: Icon(Icons.school_outlined, color: AppTheme.primaryBlue, size: 20),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            child['name'] ?? '',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5, color: AppTheme.textPrimary),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            'Kelas ${child['class_name'] ?? '-'} • ${child['student_code'] ?? ''}',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    // Status Badge (Fixed right-aligned, anti-overlap)
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                                       decoration: BoxDecoration(
                                         color: isSubmitted
-                                            ? const Color(0xFFF1F5F9)
+                                            ? const Color(0xFFF0FDF4)
                                             : (isExcused
                                                 ? const Color(0xFFEFF6FF)
-                                                : AppTheme.amberSurface),
+                                                : const Color(0xFFFFFBEB)),
                                         borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
                                           color: isSubmitted
-                                              ? AppTheme.cardBorder
+                                              ? const Color(0xFFBBF7D0)
                                               : (isExcused
                                                   ? const Color(0xFFBFDBFE)
                                                   : const Color(0xFFFDE68A)),
@@ -774,10 +762,10 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                             height: 6,
                                             decoration: BoxDecoration(
                                               color: isSubmitted
-                                                  ? const Color(0xFF10B981)
+                                                  ? const Color(0xFF16A34A)
                                                   : (isExcused
-                                                      ? const Color(0xFF3B82F6)
-                                                      : AppTheme.secondaryTangerine),
+                                                      ? const Color(0xFF2563EB)
+                                                      : const Color(0xFFD97706)),
                                               shape: BoxShape.circle,
                                             ),
                                           ),
@@ -788,8 +776,8 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                                 : (isExcused ? absenceCat : 'Belum Lapor'),
                                             style: TextStyle(
                                               color: isSubmitted
-                                                  ? AppTheme.textPrimary
-                                                  : (isExcused ? const Color(0xFF1D4ED8) : AppTheme.amberText),
+                                                  ? const Color(0xFF15803D)
+                                                  : (isExcused ? const Color(0xFF1D4ED8) : const Color(0xFFB45309)),
                                               fontWeight: FontWeight.bold,
                                               fontSize: 11,
                                             ),
@@ -797,19 +785,106 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(height: 6),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 10),
+                                const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                                const SizedBox(height: 8),
+
+                                // Row 2: Compliance Metric on Left + Action Link on Right
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    if (weeklyRate != null)
+                                      Flexible(
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.verified_outlined,
+                                              size: 13,
+                                              color: weeklyRate < 75.0
+                                                  ? AppTheme.errorRed
+                                                  : (weeklyRate < 90.0 ? const Color(0xFFD97706) : const Color(0xFF10B981)),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                              child: Text(
+                                                'Kepatuhan: ${weeklyRate.toStringAsFixed(0)}% ($statusLabel)',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 11.5,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: weeklyRate < 75.0
+                                                      ? AppTheme.errorRed
+                                                      : (weeklyRate < 90.0 ? const Color(0xFFB45309) : const Color(0xFF059669)),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    else
+                                      const SizedBox.shrink(),
                                     const Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
                                           'Riwayat & Rekap',
-                                          style: TextStyle(fontSize: 11, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
+                                          style: TextStyle(fontSize: 11.5, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
                                         ),
+                                        SizedBox(width: 2),
                                         Icon(Icons.chevron_right, size: 14, color: AppTheme.primaryBlue),
                                       ],
                                     ),
                                   ],
                                 ),
+
+                                // Row 3: Weekly AI Digest Banner (if available)
+                                if (child['latest_weekly_evaluation'] != null) ...[
+                                  const SizedBox(height: 8),
+                                  InkWell(
+                                    onTap: () {
+                                      final eval = WeeklyEvaluation.fromJson(child['latest_weekly_evaluation']);
+                                      WeeklyEvaluationSheet.show(
+                                        context,
+                                        evaluation: eval,
+                                        studentName: child['name'] ?? 'Ananda',
+                                        isParent: true,
+                                      );
+                                    },
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF5F3FF),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: const Color(0xFFDDD6FE)),
+                                      ),
+                                      child: const Row(
+                                        children: [
+                                          Icon(Icons.auto_awesome, size: 14, color: Color(0xFF7C3AED)),
+                                          SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              'Rangkuman Belajar Pekan Ini Sudah Terbit',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF6D28D9),
+                                              ),
+                                            ),
+                                          ),
+                                          Icon(Icons.arrow_forward_ios, size: 10, color: Color(0xFF7C3AED)),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -1032,8 +1107,17 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(studentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary)),
+                                      Expanded(
+                                        child: Text(
+                                          studentName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
                                       Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
                                           if (hasPhoto) ...[
                                             const Icon(Icons.photo_camera_outlined, size: 14, color: AppTheme.primaryBlue),
@@ -1111,14 +1195,21 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                                           ),
                                         )
                                       else
-                                        OutlinedButton.icon(
-                                          onPressed: () => _showAppreciationDialog(report['id'], studentName),
-                                          icon: const Icon(Icons.favorite_border, color: AppTheme.secondaryTangerine, size: 15),
-                                          label: const Text('Beri Apresiasi', style: TextStyle(color: AppTheme.secondaryTangerine, fontSize: 12, fontWeight: FontWeight.bold)),
-                                          style: OutlinedButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                            side: const BorderSide(color: AppTheme.secondaryTangerine),
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        Flexible(
+                                          child: OutlinedButton.icon(
+                                            onPressed: () => _showAppreciationDialog(report['id'], studentName),
+                                            icon: const Icon(Icons.favorite_border, color: AppTheme.secondaryTangerine, size: 15),
+                                            label: const Text(
+                                              'Beri Apresiasi',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(color: AppTheme.secondaryTangerine, fontSize: 12, fontWeight: FontWeight.bold),
+                                            ),
+                                            style: OutlinedButton.styleFrom(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                              side: const BorderSide(color: AppTheme.secondaryTangerine),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                            ),
                                           ),
                                         ),
                                       const SizedBox(width: 8),

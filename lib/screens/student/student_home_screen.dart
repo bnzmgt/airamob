@@ -13,6 +13,8 @@ import 'edit_report_screen.dart';
 import 'student_incident_history_screen.dart';
 import 'student_reports_list_screen.dart';
 import '../../services/notification_service.dart';
+import '../../models/weekly_evaluation.dart';
+import '../../widgets/weekly_evaluation_sheet.dart';
 
 import '../profile/profile_screen.dart';
 
@@ -312,6 +314,78 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                         ),
                       ],
 
+                      // Weekly AI Digest Card
+                      if (_dashboardData?['latest_weekly_evaluation'] != null) ...[
+                        Builder(
+                          builder: (context) {
+                            final latestWeeklyJson = _dashboardData!['latest_weekly_evaluation'];
+                            final eval = WeeklyEvaluation.fromJson(latestWeeklyJson);
+                            final snippet = eval.studentReflectionNarrative ?? '';
+                            if (snippet.isEmpty) return const SizedBox.shrink();
+
+                            return InkWell(
+                              onTap: () {
+                                WeeklyEvaluationSheet.show(
+                                  context,
+                                  evaluation: eval,
+                                  studentName: _studentName,
+                                  isParent: false,
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF5F3FF),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: const Color(0xFFDDD6FE)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFEDE9FE),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(Icons.auto_awesome, color: Color(0xFF7C3AED), size: 20),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Rangkuman Belajar Pekan Ini',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                              color: Color(0xFF5B21B6),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            snippet,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFF6D28D9),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(Icons.arrow_forward_ios, size: 12, color: Color(0xFF7C3AED)),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+
                       // Today's Report Status Card
                     Card(
                       color: Colors.white,
@@ -323,14 +397,19 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
-                                  'Laporan Belajar Hari Ini',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: AppTheme.textPrimary,
+                                const Expanded(
+                                  child: Text(
+                                    'Laporan Belajar Hari Ini',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: AppTheme.textPrimary,
+                                    ),
                                   ),
                                 ),
+                                const SizedBox(width: 8),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(

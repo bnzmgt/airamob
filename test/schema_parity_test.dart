@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ainara_mobile/models/weekly_evaluation.dart';
+import 'package:ainara_mobile/core/api/api_endpoints.dart';
 
 void main() {
   group('Backend-to-Mobile Schema & Enum Parity Tests', () {
@@ -209,6 +211,58 @@ void main() {
       }
       expect(mockCompliancePayload['weekly'], isA<Map>());
       expect(mockCompliancePayload['monthly'], isA<Map>());
+    });
+
+    test('WeeklyEvaluation model correctly parses backend Saturday AI Digest payload', () {
+      final mockParentPayload = {
+        'id': 10,
+        'week_start_date': '2026-11-02',
+        'week_end_date': '2026-11-07',
+        'parent_report_narrative': 'Ananda sangat konsisten menyelesaikan tugas pekan ini.',
+        'student_reflection_narrative': 'Hebat! Pertahankan konsistensi belajar kamu pekan depan.',
+        'total_reports_submitted': 6,
+        'total_active_days': 6,
+        'total_excused_days': 0,
+        'total_missing_days': 0,
+        'compliance_rate': 100.0,
+      };
+
+      final eval = WeeklyEvaluation.fromJson(mockParentPayload);
+      expect(eval.id, 10);
+      expect(eval.weekStartDate, '2026-11-02');
+      expect(eval.weekEndDate, '2026-11-07');
+      expect(eval.parentReportNarrative, 'Ananda sangat konsisten menyelesaikan tugas pekan ini.');
+      expect(eval.studentReflectionNarrative, 'Hebat! Pertahankan konsistensi belajar kamu pekan depan.');
+      expect(eval.totalReportsSubmitted, 6);
+      expect(eval.totalActiveDays, 6);
+      expect(eval.totalMissingDays, 0);
+      expect(eval.complianceRate, 100.0);
+
+      // Student payload has parent_report_narrative strictly null
+      final mockStudentPayload = {
+        'id': 10,
+        'week_start_date': '2026-11-02',
+        'week_end_date': '2026-11-07',
+        'parent_report_narrative': null,
+        'student_reflection_narrative': 'Hebat! Pertahankan konsistensi belajar kamu.',
+        'total_reports_submitted': 5,
+        'total_active_days': 6,
+        'total_excused_days': 1,
+        'total_missing_days': 0,
+        'compliance_rate': 100.0,
+      };
+
+      final studentEval = WeeklyEvaluation.fromJson(mockStudentPayload);
+      expect(studentEval.parentReportNarrative, isNull);
+      expect(studentEval.studentReflectionNarrative, isNotNull);
+      expect(studentEval.totalExcusedDays, 1);
+    });
+
+    test('ApiEndpoints includes Phase 18 Batch 5 weekly evaluation URLs', () {
+      expect(ApiEndpoints.studentWeeklyEvaluations, contains('/student/weekly-evaluations'));
+      expect(ApiEndpoints.studentLatestWeeklyEvaluation, contains('/student/weekly-evaluations/latest'));
+      expect(ApiEndpoints.parentChildWeeklyEvaluations(5), contains('/parent/students/5/weekly-evaluations'));
+      expect(ApiEndpoints.parentChildLatestWeeklyEvaluation(5), contains('/parent/students/5/weekly-evaluations/latest'));
     });
   });
 }

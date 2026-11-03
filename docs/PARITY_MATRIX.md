@@ -100,11 +100,12 @@ Dokumen ini adalah **Single Source of Truth** untuk melacak keselarasan (*parity
 | `/api/v1/student/compliance` | GET | `weekly`, `monthly`, `weekly_rate`, `monthly_rate`, `status_label`, `status_level` | `StudentHomeScreen` | 🟢 100% Selaras | Metrik kepatuhan lapor siswa: hari aktif sekolah, pengecualian libur/izin, & missing count (Batch 4). |
 | `/api/v1/parent/students/{id}/compliance` | GET | `student_id`, `student_name`, `weekly`, `monthly`, `weekly_rate`, `monthly_rate` | `ParentHomeScreen` | 🟢 100% Selaras | Metrik kepatuhan anak spesifik & persentase kedisiplinan lapor mingguan/bulanan (Batch 4). |
 | Backdated Locking Enforcement | RULE | `$date < $today` ditolak (ValidationException) | `SubmitReportScreen` | 🟢 100% Selaras | Integritas lapor hari berjalan: siswa dilarang melapor untuk tanggal lampau secara mandiri. |
-| `/api/v1/weekly-evaluations/{id}` | GET | `parent_report_narrative`, `student_reflection_narrative`, `compliance_rate`, `missing_days` | `WeeklyDigestSheet` | 📋 Planned | Laporan naratif mingguan AI di hari Sabtu (Parent & Student). |
+| `/api/v1/student/weekly-evaluations[/latest]` | GET | `student_reflection_narrative`, `compliance_rate`, `total_reports_submitted`, `total_active_days` | `WeeklyEvaluationSheet` | 🟢 100% Selaras | Laporan naratif mingguan AI di hari Sabtu (Parent Report Narrative strictly hidden for confidentiality) (Batch 5). |
+| `/api/v1/parent/students/{id}/weekly-evaluations[/latest]` | GET | `parent_report_narrative`, `student_reflection_narrative`, `compliance_rate`, `total_reports_submitted` | `WeeklyEvaluationSheet` | 🟢 100% Selaras | Laporan naratif mingguan AI lengkap untuk orang tua & refleksi anak di hari Sabtu (Batch 5). |
 | `/api/v1/mentor/students/{id}/learning-gaps` | GET | `recent_frustrations`, `frequent_tags` | `SubmitMentorReportScreen` | 📋 Planned | Agregasi kendala belajar siswa untuk rekomendasi materi les privat. |
 | Background Dispatch (FCM HTTP v1) | PUSH | `title: "Hai [Nama]!"` (khusus siswa) | Push Notification Listener | 🟢 100% Selaras | Command `ainara:remind-unreported-students` jalan pukul 20:00 WIB jika siswa belum lapor & belum izin. |
 | Background Dispatch (FCM HTTP v1) | PUSH | `title: "[Nama Anak] Baru Saja Mengirim Laporan Belajar"` (tanpa icon, tanpa body) | Push Notification Listener | 🟢 100% Selaras | Notifikasi instan ke HP orang tua saat anak kirim laporan harian via web/mobile. |
-| Background Dispatch (FCM HTTP v1) | PUSH | `title: "Rangkuman Belajar Pekan Ini untuk [Nama Anak] Sudah Terbit"` (tanpa icon, tanpa body) | Push Notification Listener | 📋 Planned | Notifikasi ke HP orang tua saat laporan mingguan Sabtu terbit. |
+| Background Dispatch (FCM HTTP v1) | PUSH | `title: "Rangkuman Belajar Pekan Ini untuk [Nama Anak] Sudah Terbit"` (tanpa icon, tanpa body) | Push Notification Listener | 🟢 100% Selaras | Notifikasi ke HP orang tua saat laporan mingguan Sabtu terbit (Batch 5). |
 
 ---
 

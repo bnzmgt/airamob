@@ -71,14 +71,18 @@ class ApiEndpoints {
   static String parentChildReports(int studentId) => '$baseUrl/parent/students/$studentId/reports';
   static String parentChildMentorReports(int studentId) => '$baseUrl/parent/students/$studentId/mentor-reports';
   static String parentChildCompliance(int studentId) => '$baseUrl/parent/students/$studentId/compliance';
+  static String parentChildWeeklyEvaluations(int studentId) => '$baseUrl/parent/students/$studentId/weekly-evaluations';
+  static String parentChildLatestWeeklyEvaluation(int studentId) => '$baseUrl/parent/students/$studentId/weekly-evaluations/latest';
   static String parentMentorReportDetail(int id) => '$baseUrl/parent/mentor-reports/$id';
   static String get parentReportsExportCsv => '$baseUrl/parent/reports/export/csv';
   static String get parentReportsExportPdf => '$baseUrl/parent/reports/export/pdf';
   static String parentChildExportCsv(int studentId) => '$baseUrl/parent/students/$studentId/export/csv';
   static String parentChildExportPdf(int studentId) => '$baseUrl/parent/students/$studentId/export/pdf';
 
-  // Student Mentor Reports
+  // Student Mentor Reports & Weekly Evaluations
   static String get studentMentorReports => '$baseUrl/student/mentor-reports';
+  static String get studentWeeklyEvaluations => '$baseUrl/student/weekly-evaluations';
+  static String get studentLatestWeeklyEvaluation => '$baseUrl/student/weekly-evaluations/latest';
 
   // Mentor Endpoints
   static String get mentorDashboard => '$baseUrl/mentor/dashboard';
