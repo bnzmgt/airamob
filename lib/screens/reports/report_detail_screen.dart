@@ -435,6 +435,9 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
     final List<dynamic> appreciations = _report!['all_appreciations'] ?? _report!['appreciations'] ?? [];
     final studentData = _report!['student'];
     final parentGuidance = _report!['ai_parent_guidance'];
+    final Map<String, dynamic>? playbook = _report!['counseling_playbook'] != null
+        ? Map<String, dynamic>.from(_report!['counseling_playbook'] as Map)
+        : null;
 
     return RefreshIndicator(
       onRefresh: _loadReport,
@@ -764,49 +767,8 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
               const SizedBox(height: 16),
             ],
 
-            // AI Parent Guidance Card
-            if (parentGuidance != null && parentGuidance.toString().isNotEmpty) ...[
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: const Border(
-                    left: BorderSide(color: AppTheme.primaryBlue, width: 3),
-                    top: BorderSide(color: AppTheme.cardBorder, width: 1),
-                    right: BorderSide(color: AppTheme.cardBorder, width: 1),
-                    bottom: BorderSide(color: AppTheme.cardBorder, width: 1),
-                  ),
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.psychology_outlined, color: AppTheme.primaryBlue, size: 22),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            '💡 Panduan Apresiasi Orang Tua (AI)',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: AppTheme.primaryBlue,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      parentGuidance.toString(),
-                      style: const TextStyle(fontSize: 13.5, height: 1.5, color: AppTheme.textPrimary),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
+            // AI Parent Actionable Counseling Playbook Card (Phase 18 Section 52)
+            _buildCounselingPlaybookCard(playbook, parentGuidance),
 
             // Appreciations Section
             if (appreciations.isNotEmpty) ...[
@@ -880,6 +842,199 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
             const SizedBox(height: 24),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCounselingPlaybookCard(Map<String, dynamic>? playbook, dynamic rawGuidance) {
+    if (playbook == null && (rawGuidance == null || rawGuidance.toString().isEmpty)) {
+      return const SizedBox.shrink();
+    }
+
+    final String title = playbook?['title'] ?? 'Panduan Apresiasi Orang Tua (AI)';
+    final String? starter = playbook?['starter'];
+    final String? summary = playbook?['summary'];
+    final List<dynamic> dos = playbook?['dos'] ?? [];
+    final List<dynamic> donts = playbook?['donts'] ?? [];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFBFDBFE)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF3B82F6).withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFDBEAFE)),
+                ),
+                child: const Icon(Icons.psychology_outlined, color: AppTheme.primaryBlue, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.primaryBlue),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Khusus Ayah/Bunda • Bahan obrolan verbal tatap muka',
+                      style: TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (summary != null && summary.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              summary,
+              style: const TextStyle(fontSize: 13, height: 1.45, color: AppTheme.textPrimary),
+            ),
+          ] else if (rawGuidance != null && dos.isEmpty && donts.isEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              rawGuidance.toString(),
+              style: const TextStyle(fontSize: 13, height: 1.45, color: AppTheme.textPrimary),
+            ),
+          ],
+          if (starter != null && starter.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.chat_bubble_outline, size: 14, color: AppTheme.primaryBlue),
+                      SizedBox(width: 6),
+                      Text(
+                        'Pemantik Obrolan Lisan (Bisa Diucapkan ke Ananda):',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: AppTheme.primaryBlue),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '"$starter"',
+                    style: const TextStyle(fontSize: 13, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600, color: Color(0xFF1E293B), height: 1.4),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (dos.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFBBF7D0)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.check_circle_outline, size: 15, color: Color(0xFF16A34A)),
+                      SizedBox(width: 6),
+                      Text(
+                        'Yang Sebaiknya Dikatakan (Do):',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF166534)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ...dos.map((item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('• ', style: TextStyle(color: Color(0xFF16A34A), fontWeight: FontWeight.bold)),
+                            Expanded(
+                              child: Text(
+                                item.toString(),
+                                style: const TextStyle(fontSize: 12, color: Color(0xFF14532D), height: 1.35),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
+            ),
+          ],
+          if (donts.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF1F2),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFFECDD3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.highlight_off, size: 15, color: Color(0xFFE11D48)),
+                      SizedBox(width: 6),
+                      Text(
+                        'Hindari Respons Berikut (Don\'t):',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF9F1239)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ...donts.map((item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('• ', style: TextStyle(color: Color(0xFFE11D48), fontWeight: FontWeight.bold)),
+                            Expanded(
+                              child: Text(
+                                item.toString(),
+                                style: const TextStyle(fontSize: 12, color: Color(0xFF881337), height: 1.35),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

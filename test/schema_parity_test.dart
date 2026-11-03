@@ -94,6 +94,15 @@ void main() {
         'ai_tags': ['IPA', 'TataSurya'],
         'sentiment_level': 'yellow',
         'ai_parent_guidance': 'Dampingi ananda dengan video animasi orbit planet.',
+        'counseling_playbook': {
+          'level': 'yellow',
+          'type': 'actionable_playbook',
+          'title': 'Panduan Obrolan Suportif',
+          'summary': 'Ananda menghadapi tantangan.',
+          'starter': 'Bagian mana yang bingung?',
+          'dos': ['Validasi emosi'],
+          'donts': ['Hindari membandingkan'],
+        },
         'submitted_at': '2026-10-31T07:00:00.000000Z',
         'my_appreciation': {
           'id': 10,
@@ -108,6 +117,7 @@ void main() {
       final parentSpecificKeys = [
         'student',
         'ai_parent_guidance',
+        'counseling_playbook',
         'my_appreciation',
         'all_appreciations',
       ];
@@ -118,6 +128,7 @@ void main() {
       }
 
       expect(mockBackendParentPayload['ai_parent_guidance'], isNotNull);
+      expect(mockBackendParentPayload['counseling_playbook'], isA<Map>());
     });
 
     test('LANTANG Safeguarding status enum matches frontend stage colors', () {

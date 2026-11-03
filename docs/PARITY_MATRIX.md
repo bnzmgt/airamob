@@ -59,7 +59,7 @@ Dokumen ini adalah **Single Source of Truth** untuk melacak keselarasan (*parity
 | `/api/v1/parent/dashboard` | GET | `children [] { id, name, student_code, class_name, is_submitted, today_report }` | `ParentHomeScreen` | 🟢 100% Selaras | Banner status anak hari ini, snippet laporan, direct action apresiasi. |
 | `/api/v1/parent/reports` | GET | Unified feed across children | `ChildReportsScreen` | 🟢 100% Selaras | Filter multi-anak & filter rentang tanggal. |
 | `/api/v1/parent/students/{id}/reports` | GET | Riwayat laporan anak spesifik | `ChildReportsScreen` | 🟢 100% Selaras | Infinite scroll pagination & tag subjek AI. |
-| `/api/v1/parent/reports/{id}` | GET | Detail laporan + `ai_parent_guidance` + `my_appreciation` + `all_appreciations` | `ReportDetailScreen` | 🟡 Parsial | Kartu "Panduan Apresiasi AI" tampil; badge level sentimen AI perlu penyelarasan enum. |
+| `/api/v1/parent/reports/{id}` | GET | Detail laporan + `ai_parent_guidance` + `counseling_playbook` + `my_appreciation` + `all_appreciations` | `ReportDetailScreen` | 🟢 100% Selaras | Kartu "AI Actionable Counseling Playbook" (Conversation Starter & Do's/Don'ts) tampil interaktif dan privat bagi orang tua. |
 | `/api/v1/parent/reports/{id}/appreciations` | POST | `reaction_type`, `message` (maks 250 kar) | Modal Apresiasi / Sheet | 🟢 100% Selaras | Emoji 1-klik (Barakallah, Bangga, Keren, Semangat) + pesan catatan orang tua. |
 | `/api/v1/parent/reports/export/pdf` & `/csv` | GET | Streamed Binary / CSV UTF-8 BOM | `ChildReportsScreen` | 🟢 100% Selaras | Download langsung ke storage HP. |
 | `/api/v1/parent/students/{id}/mentor-reports` | GET | Riwayat les privat anak dari mentor | `ChildReportsScreen` (Tab Les Privat) | 🟢 100% Selaras | Kartu materi ajar, pemahaman materi, catatan guru les & foto. |
@@ -94,7 +94,7 @@ Dokumen ini adalah **Single Source of Truth** untuk melacak keselarasan (*parity
 | Endpoint Backend | Method | Payload / Data Dikirim | Screen Mobile | Status | Catatan Keselarasan |
 | :--- | :---: | :--- | :--- | :---: | :--- |
 | `/api/v1/student/reports` & `/{id}` | POST / PUT | Multi-part: `audio` | Form Laporan Siswa | ❄️ FROZEN | DIBEKUKAN MUTLAK (tidak dikerjakan tanpa approval). |
-| `/api/v1/student/reports/{id}` & `/parent/reports/{id}` | GET | `ai_parent_guidance` | `ReportDetailScreen` | 📋 Planned | Panduan obrolan hangat orang tua yang selalu aktif (Green/Yellow/Red). |
+| `/api/v1/parent/reports/{id}` | GET | `ai_parent_guidance`, `counseling_playbook` | `ReportDetailScreen` | 🟢 100% Selaras | Panduan obrolan hangat orang tua yang selalu aktif (Green/Yellow/Red) + Do's & Don'ts. Privat orang tua (Batch 3). |
 | `/api/v1/student/daily-quote` | GET | `quote`, `theme`, `date` | `StudentHomeScreen` | 🟢 100% Selaras | Banner quote inspirasi harian global untuk seluruh siswa (cached harian & fallback). |
 | `/api/v1/parent/absences` | GET / POST | `student_id`, `absence_date`, `category`, `reason`, `attachment` | `ParentHomeScreen` & Dialog | 🟢 100% Selaras | Pengajuan izin/sakit anak oleh orang tua (status `EXCUSED`), bypass pengingat otomatis. |
 | `/api/v1/weekly-evaluations/{id}` | GET | `parent_report_narrative`, `student_reflection_narrative`, `compliance_rate`, `missing_days` | `WeeklyDigestSheet` | 📋 Planned | Laporan naratif mingguan AI di hari Sabtu (Parent & Student). |
