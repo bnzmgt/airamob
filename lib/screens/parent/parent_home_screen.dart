@@ -8,6 +8,7 @@ import '../auth/login_screen.dart';
 import '../reports/report_detail_screen.dart';
 import '../profile/profile_screen.dart';
 import 'child_reports_screen.dart';
+import 'parent_all_reports_screen.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/floating_nav_bar.dart';
 
@@ -24,6 +25,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
   String _parentName = 'Orang Tua';
   List<dynamic> _children = [];
   List<dynamic> _reports = [];
+  int _totalReports = 0;
 
   int? _selectedStudentId;
   DateTime? _fromDate;
@@ -74,6 +76,8 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
       }
       if (reportRes.success && reportRes.data != null) {
         _reports = (reportRes.data['items'] as List?) ?? [];
+        final pagination = reportRes.data['pagination'];
+        _totalReports = pagination != null ? (pagination['total'] ?? _reports.length) : _reports.length;
       }
     });
   }
@@ -648,7 +652,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Feed Laporan Belajar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary)),
-                        Text('${_reports.length} Laporan', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+                        Text('$_totalReports Laporan', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -682,7 +686,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                         ),
                       )
                     else
-                      ..._reports.map((report) {
+                      ..._reports.take(6).map((report) {
                         final studentName = report['student']?['name'] ?? 'Ananda';
                         final myAppreciation = report['my_appreciation'];
                         final hasPhoto = report['photo_url'] != null;
@@ -811,6 +815,34 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                           ),
                         );
                       }),
+                    if (_totalReports > 6 || _reports.length > 6)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, bottom: 8),
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ParentAllReportsScreen(
+                                  initialChildren: _children,
+                                  initialSelectedStudentId: _selectedStudentId,
+                                ),
+                              ),
+                            ).then((_) => _loadData());
+                          },
+                          icon: const Icon(Icons.menu_book, size: 16, color: AppTheme.primaryBlue),
+                          label: Text(
+                            'Lihat Semua ($_totalReports Laporan)',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFFBFDBFE)),
+                            backgroundColor: const Color(0xFFEFF6FF),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -821,24 +853,21 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         onTap: (index) {
           if (index == 0) return;
           if (index == 1) {
-            if (_children.isNotEmpty) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ChildReportsScreen(
-                    studentId: _children.first['id'],
-                    initialStudentName: _children.first['name'],
-                    initialTab: 0,
-                  ),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ParentAllReportsScreen(
+                  initialChildren: _children,
+                  initialSelectedStudentId: _selectedStudentId,
                 ),
-              ).then((_) => _loadData());
-            } else {
+              ),
+            ).then((_) => _loadData());
+          } else if (index == 2) {
+            if (_children.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Belum ada ananda yang terhubung.')),
               );
-            }
-          } else if (index == 2) {
-            if (_children.isNotEmpty) {
+            } else if (_children.length == 1) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -850,8 +879,49 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                 ),
               ).then((_) => _loadData());
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Belum ada ananda yang terhubung.')),
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (ctx) => SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Pilih Ananda untuk Laporan Les',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                        ),
+                        const SizedBox(height: 12),
+                        ..._children.map((child) => ListTile(
+                          leading: const CircleAvatar(
+                            backgroundColor: Color(0xFFEFF6FF),
+                            child: Icon(Icons.school, color: AppTheme.primaryBlue),
+                          ),
+                          title: Text(child['name'] ?? 'Ananda', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          subtitle: Text('Kelas: ${child['class_name'] ?? '-'}'),
+                          trailing: const Icon(Icons.chevron_right, color: AppTheme.textMuted),
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ChildReportsScreen(
+                                  studentId: child['id'],
+                                  initialStudentName: child['name'],
+                                  initialTab: 1,
+                                ),
+                              ),
+                            ).then((_) => _loadData());
+                          },
+                        )),
+                      ],
+                    ),
+                  ),
+                ),
               );
             }
           } else if (index == 3) {
