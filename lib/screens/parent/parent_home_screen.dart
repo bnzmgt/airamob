@@ -149,14 +149,25 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
         final nowStr = _formatDate(DateTime.now());
         final filename = 'rekap_laporan_terpadu_$nowStr.$ext';
 
-        downloadFile(res.bodyBytes, filename);
+        final savedPath = await downloadFile(res.bodyBytes, filename);
+        if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('File ${ext.toUpperCase()} berhasil diunduh: $filename'),
-            backgroundColor: AppTheme.primaryBlue,
-          ),
-        );
+        if (savedPath != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('File ${ext.toUpperCase()} tersimpan di:\n$savedPath'),
+              backgroundColor: AppTheme.primaryBlue,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Gagal menyimpan file ke penyimpanan perangkat.'),
+              backgroundColor: AppTheme.destructive,
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

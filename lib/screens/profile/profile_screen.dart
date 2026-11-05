@@ -900,6 +900,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    const Center(
+                      child: Text(
+                        'Versi Aplikasi: 1.1.2 (Build 4)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textMuted,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 24),
                   ],
                 ),

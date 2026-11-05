@@ -200,14 +200,25 @@ class _ParentAllReportsScreenState extends State<ParentAllReportsScreen> {
         final cleanLabel = studentLabel.toString().replaceAll(' ', '_');
         final filename = 'rekap_laporan_${cleanLabel}_$nowStr.$ext';
 
-        downloadFile(res.bodyBytes, filename);
+        final savedPath = await downloadFile(res.bodyBytes, filename);
+        if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('File ${ext.toUpperCase()} berhasil diunduh: $filename'),
-            backgroundColor: AppTheme.primaryBlue,
-          ),
-        );
+        if (savedPath != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('File ${ext.toUpperCase()} tersimpan di:\n$savedPath'),
+              backgroundColor: AppTheme.primaryBlue,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Gagal menyimpan file ke penyimpanan perangkat.'),
+              backgroundColor: AppTheme.destructive,
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -657,7 +668,10 @@ class _ParentAllReportsScreenState extends State<ParentAllReportsScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => ReportDetailScreen(reportId: report['id']),
+                                builder: (_) => ReportDetailScreen(
+                                  reportId: report['id'],
+                                  isParent: true,
+                                ),
                               ),
                             ).then((_) => _loadReports(page: 1));
                           },
@@ -786,7 +800,10 @@ class _ParentAllReportsScreenState extends State<ParentAllReportsScreen> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => ReportDetailScreen(reportId: report['id']),
+                                            builder: (_) => ReportDetailScreen(
+                                              reportId: report['id'],
+                                              isParent: true,
+                                            ),
                                           ),
                                         ).then((_) => _loadReports(page: 1));
                                       },

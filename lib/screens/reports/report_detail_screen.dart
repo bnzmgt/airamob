@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/api_endpoints.dart';
 import '../../core/debug/data_inspector_sheet.dart';
+import '../../core/storage/secure_storage.dart';
 import '../../core/theme/app_theme.dart';
 import '../student/edit_report_screen.dart';
 
@@ -21,6 +22,7 @@ class ReportDetailScreen extends StatefulWidget {
 
 class _ReportDetailScreenState extends State<ReportDetailScreen> {
   bool _isLoading = true;
+  bool _isParent = false;
   Map<String, dynamic>? _report;
   String? _errorMessage;
 
@@ -39,6 +41,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _isParent = widget.isParent;
     _loadReport();
   }
 
@@ -54,7 +57,12 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
       _errorMessage = null;
     });
 
-    final url = widget.isParent
+    final role = await SecureStorage.getRole();
+    if (role == 'parent') {
+      _isParent = true;
+    }
+
+    final url = _isParent
         ? '${ApiEndpoints.parentReports}/${widget.reportId}'
         : '${ApiEndpoints.studentReports}/${widget.reportId}';
 
@@ -66,7 +74,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
       _isLoading = false;
       if (response.success && response.data != null) {
         _report = response.data;
-        if (widget.isParent && _report?['my_appreciation'] != null) {
+        if (_isParent && _report?['my_appreciation'] != null) {
           _selectedReaction = _report!['my_appreciation']['reaction_type'] ?? 'barakallah';
           _appreciationMsgController.text = _report!['my_appreciation']['message'] ?? '';
         }
@@ -324,7 +332,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
       appBar: AppBar(
         title: const Text('Detail Laporan Belajar'),
         actions: [
-          if (!widget.isParent && _report != null)
+          if (!_isParent && _report != null)
             IconButton(
               icon: const Icon(Icons.edit_note),
               tooltip: 'Edit Laporan',
@@ -402,7 +410,7 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                   ),
                 )
               : _buildReportContent(),
-      bottomNavigationBar: widget.isParent && _report != null
+      bottomNavigationBar: _isParent && _report != null
           ? Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(

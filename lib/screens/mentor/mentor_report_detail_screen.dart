@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/api/api_endpoints.dart';
+import '../../core/storage/secure_storage.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/mentor_report.dart';
 import '../../services/mentor_service.dart';
@@ -38,7 +39,10 @@ class _MentorReportDetailScreenState extends State<MentorReportDetailScreen> {
       _errorMessage = null;
     });
 
-    final response = await MentorService.getReportDetail(widget.reportId);
+    final role = await SecureStorage.getRole();
+    final response = (role == 'parent')
+        ? await MentorService.getParentMentorReportDetail(widget.reportId)
+        : await MentorService.getReportDetail(widget.reportId);
 
     if (!mounted) return;
 

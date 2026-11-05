@@ -94,6 +94,10 @@ class MentorService {
     return await ApiClient.get(ApiEndpoints.parentChildMentorReports(studentId));
   }
 
+  static Future<ApiResponse> getParentMentorReportDetail(int id) async {
+    return await ApiClient.get(ApiEndpoints.parentMentorReportDetail(id));
+  }
+
   static Future<ApiResponse> getStudentMentorReports() async {
     return await ApiClient.get(ApiEndpoints.studentMentorReports);
   }

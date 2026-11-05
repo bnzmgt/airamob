@@ -46,9 +46,8 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
   void initState() {
     super.initState();
     _selectedTab = widget.initialTab;
-    if (_selectedTab == 0) {
-      _loadReports();
-    } else {
+    _loadReports();
+    if (_selectedTab == 1) {
       _loadMentorReports();
     }
   }
@@ -159,15 +158,20 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
 
     if (response.success && response.data is Map) {
       final data = response.data as Map<String, dynamic>;
-      final reports = data['reports'] as List? ?? [];
+      final rawReports = (data['items'] ?? data['reports']) as List? ?? [];
       setState(() {
+        _isLoading = false;
         _isLoadingMentorReports = false;
-        _mentorReports = reports
+        if (data['student'] != null && data['student'] is Map) {
+          _student ??= data['student'] as Map<String, dynamic>;
+        }
+        _mentorReports = rawReports
             .map((r) => MentorReport.fromJson(r as Map<String, dynamic>))
             .toList();
       });
     } else {
       setState(() {
+        _isLoading = false;
         _isLoadingMentorReports = false;
         _mentorReportsError = response.message ?? 'Gagal memuat laporan bimbingan les.';
       });
@@ -200,14 +204,25 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
         final studentName = _student?['name']?.toString().replaceAll(' ', '_') ?? 'siswa';
         final filename = 'rekap_laporan_${studentName}_$nowStr.$ext';
 
-        downloadFile(res.bodyBytes, filename);
+        final savedPath = await downloadFile(res.bodyBytes, filename);
+        if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('File ${ext.toUpperCase()} berhasil diunduh: $filename'),
-            backgroundColor: AppTheme.primaryBlue,
-          ),
-        );
+        if (savedPath != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('File ${ext.toUpperCase()} tersimpan di:\n$savedPath'),
+              backgroundColor: AppTheme.primaryBlue,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Gagal menyimpan file ke penyimpanan perangkat.'),
+              backgroundColor: AppTheme.destructive,
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -375,7 +390,7 @@ class _ChildReportsScreenState extends State<ChildReportsScreen> {
           ),
         ],
       ),
-      body: _isLoading && _student == null
+      body: _isLoading && _student == null && widget.initialStudentName == null
           ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
           : RefreshIndicator(
               onRefresh: () async {
